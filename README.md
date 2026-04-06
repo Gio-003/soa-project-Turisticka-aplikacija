@@ -1,2 +1,2 @@
-# soa-project-Turisti-ka-aplikacija
+# soa-project-Turisticka-aplikacija
 Turistička aplikacija
