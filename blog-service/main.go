@@ -24,15 +24,13 @@ func main() {
 	blogHandler := &handler.BlogHandler{Service: blogService}
 
 	router := mux.NewRouter()
-	port := ":8080"
 	router.HandleFunc("/blogs", blogHandler.CreateBlog).Methods("POST")
+
+	port := ":8080"
 	log.Println("Starting server on " + port)
+
+	// Samo jedan poziv je potreban
 	if err := http.ListenAndServe(port, router); err != nil {
-		log.Fatal("Failed to start server:", err)
-	}
-	log.Println("Server started on " + port)
-	err := http.ListenAndServe(port, router)
-	if err != nil {
 		log.Fatal("Failed to start server: ", err)
 	}
 }

@@ -1,6 +1,7 @@
 package db
 
 import (
+	"blog-service/models"
 	"fmt"
 	"log"
 	"os"
@@ -24,6 +25,6 @@ func InitDB() *gorm.DB {
 	}
 
 	fmt.Println("Database connection successful.")
-	//db.AutoMigrate(&models.Blog{})
+	db.AutoMigrate(&models.Blog{})
 	return db
 }
