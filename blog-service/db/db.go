@@ -14,7 +14,7 @@ func InitDB() *gorm.DB {
 	dsn := os.Getenv("DB_CONNECTION_STRING")
 
 	if dsn == "" {
-		dsn = "host=localhost user=postgres password=root dbname=blog_service port=5432"
+		dsn = "host=postgres user=postgres password=root dbname=blog_service port=5432"
 		log.Println("DB_CONNECTION_STRING not set, using default local DSN.")
 	}
 
