@@ -28,3 +28,9 @@ func (service *CommentService) CreateComment(CommentDTO *dto.CommentDTO, authorI
 	}
 	return comment, nil
 }
+func (service *CommentService) GetCommentsByBlogID(blogID string) ([]models.Comment, error) {
+	return service.Repository.GetCommentsByBlogID(blogID)
+}
+func (service *CommentService) GetAllComments() ([]models.Comment, error) {
+	return service.Repository.GettAllComments()
+}

@@ -30,6 +30,8 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/blogs", blogHandler.CreateBlog).Methods("POST")
 	router.HandleFunc("/comments", commentHandler.CreateComment).Methods("POST")
+	router.HandleFunc("/blogs/{blogId}/comments", commentHandler.GetCommentsByBlogID).Methods("GET")
+	router.HandleFunc("/comments", commentHandler.GetAllComments).Methods("GET")
 
 	port := ":8080"
 	log.Println("Starting server on " + port)
