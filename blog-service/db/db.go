@@ -14,7 +14,7 @@ func InitDB() *gorm.DB {
 	dsn := os.Getenv("DB_CONNECTION_STRING")
 
 	if dsn == "" {
-		dsn = "host=postgres user=postgres password=root dbname=blog_service port=5432"
+		dsn = "host=localhost user=postgres password=root dbname=blog_service port=5432"
 		log.Println("DB_CONNECTION_STRING not set, using default local DSN.")
 	}
 
@@ -25,6 +25,6 @@ func InitDB() *gorm.DB {
 	}
 
 	fmt.Println("Database connection successful.")
-	db.AutoMigrate(&models.Blog{})
+	db.AutoMigrate(&models.Blog{}, &models.Comment{})
 	return db
 }

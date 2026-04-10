@@ -23,13 +23,17 @@ func main() {
 	blogService := &service.BlogService{Repository: blogRepository}
 	blogHandler := &handler.BlogHandler{Service: blogService}
 
+	commentRepository := &repo.CommentRepository{Database: dbConn}
+	commentService := &service.CommentService{Repository: commentRepository}
+	commentHandler := &handler.CommentHandler{Service: commentService}
+
 	router := mux.NewRouter()
 	router.HandleFunc("/blogs", blogHandler.CreateBlog).Methods("POST")
+	router.HandleFunc("/comments", commentHandler.CreateComment).Methods("POST")
 
 	port := ":8080"
 	log.Println("Starting server on " + port)
 
-	// Samo jedan poziv je potreban
 	if err := http.ListenAndServe(port, router); err != nil {
 		log.Fatal("Failed to start server: ", err)
 	}
