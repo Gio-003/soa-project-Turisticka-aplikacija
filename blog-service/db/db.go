@@ -25,6 +25,6 @@ func InitDB() *gorm.DB {
 	}
 
 	fmt.Println("Database connection successful.")
-	db.AutoMigrate(&models.Blog{})
+	db.AutoMigrate(&models.Blog{}, &models.Comment{})
 	return db
 }
