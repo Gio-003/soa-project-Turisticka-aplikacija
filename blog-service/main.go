@@ -32,6 +32,7 @@ func main() {
 	router.HandleFunc("/comments", commentHandler.CreateComment).Methods("POST")
 	router.HandleFunc("/blogs/{blogId}/comments", commentHandler.GetCommentsByBlogID).Methods("GET")
 	router.HandleFunc("/comments", commentHandler.GetAllComments).Methods("GET")
+	router.HandleFunc("/comments/{id}", commentHandler.UpdateComment).Methods("PUT")
 
 	port := ":8080"
 	log.Println("Starting server on " + port)

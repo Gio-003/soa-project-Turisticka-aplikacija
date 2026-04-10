@@ -4,6 +4,7 @@ import (
 	"blog-service/dto"
 	"blog-service/models"
 	"blog-service/repo"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -33,4 +34,23 @@ func (service *CommentService) GetCommentsByBlogID(blogID string) ([]models.Comm
 }
 func (service *CommentService) GetAllComments() ([]models.Comment, error) {
 	return service.Repository.GettAllComments()
+}
+
+func (service *CommentService) UpdateComment(commentID string, updateDTO *dto.UpdateCommentDTO) (*models.Comment, error) {
+	commentUUID, err := uuid.Parse(commentID)
+	if err != nil {
+		return nil, err
+	}
+	comment, err := service.Repository.GetById(commentUUID)
+	if err != nil {
+		return nil, err
+	}
+	comment.Content = updateDTO.Content
+	comment.UpdatedAt = time.Now()
+	err = service.Repository.UpdateComment(comment)
+	if err != nil {
+		return nil, err
+	}
+	return comment, nil
+
 }

@@ -64,3 +64,25 @@ func (h *CommentHandler) GetAllComments(w http.ResponseWriter, r *http.Request) 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(comments)
 }
+
+func (h *CommentHandler) UpdateComment(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPut {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	vars := mux.Vars(r)
+	commentId := vars["id"]
+	var updateCommentDto dto.UpdateCommentDTO
+	err := json.NewDecoder(r.Body).Decode(&updateCommentDto)
+	if err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+	updatedComment, err := h.Service.UpdateComment(commentId, &updateCommentDto)
+	if err != nil {
+		http.Error(w, "Failed to update comment", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(updatedComment)
+}
