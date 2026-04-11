@@ -12,7 +12,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    # DODATO: Proverava da li je baza spremna pre nego što dozvoli konekcije
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d blog_service"]
       interval: 10s
@@ -24,13 +24,26 @@ services:
       context: ./blog-service
     container_name: blog_service
     depends_on:
-      # PROMENJENO: Sada čeka da healthcheck prođe
       postgres:
         condition: service_healthy
     ports:
       - "8080:8080"
     environment:
       DB_CONNECTION_STRING: "host=postgres user=postgres password=root dbname=blog_service port=5432"
+
+  stakeholders-service:
+    build:
+      context: ./stakeholders-service
+    container_name: stakeholders_service
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8081:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/stakeholders_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: root    
 
 volumes:
   postgres_data:

@@ -1,0 +1,1 @@
+CREATE DATABASE stakeholders_db;
