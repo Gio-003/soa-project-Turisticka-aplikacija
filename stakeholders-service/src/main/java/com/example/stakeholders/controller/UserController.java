@@ -1,20 +1,16 @@
 package com.example.stakeholders.controller;
 
-import java.security.Principal;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import com.example.stakeholders.dto.AdminUserDto;
 import com.example.stakeholders.dto.UserInfo;
 import com.example.stakeholders.dto.UpdateUserInfoRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;
 
-import com.example.stakeholders.model.User;
 import com.example.stakeholders.service.inter.UserService;
 
 
@@ -23,11 +19,6 @@ import com.example.stakeholders.service.inter.UserService;
 @RequestMapping(value = "/api", produces = MediaType.APPLICATION_JSON_VALUE)
 @CrossOrigin
 public class UserController {
-
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
     @Autowired
     private UserService userService;
 
@@ -61,6 +52,18 @@ public class UserController {
     @PreAuthorize("hasAnyRole('GUIDE', 'TOURIST')")
     public UserInfo updateMyInfo(Authentication authentication, @RequestBody UpdateUserInfoRequest updateUserInfoRequest) {
         return updateUserInfo(authentication, updateUserInfoRequest);
+    }
+
+    @GetMapping("/admin/users")
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<AdminUserDto> getAllUsers() {
+        return userService.getAllUsersForAdmin();
+    }
+
+    @PutMapping("/admin/users/{id}/block")
+    @PreAuthorize("hasRole('ADMIN')")
+    public AdminUserDto blockUser(@PathVariable Long id) {
+        return userService.blockUser(id);
     }
 
 }
