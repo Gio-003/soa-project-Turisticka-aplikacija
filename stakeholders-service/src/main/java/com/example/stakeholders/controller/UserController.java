@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.example.stakeholders.dto.UserInfo;
+import com.example.stakeholders.dto.UpdateUserInfoRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -41,6 +42,25 @@ public class UserController {
     public UserInfo userInfo(Authentication authentication) {
         String username = authentication.getName();
         return userService.getUserInfo(username);
+    }
+
+    @GetMapping("/me")
+    @PreAuthorize("hasAnyRole('GUIDE', 'TOURIST')")
+    public UserInfo myInfo(Authentication authentication) {
+        return userInfo(authentication);
+    }
+
+    @PutMapping("/updateMyInfo")
+    @PreAuthorize("hasAnyRole('GUIDE', 'TOURIST')")
+    public UserInfo updateUserInfo(Authentication authentication, @RequestBody UpdateUserInfoRequest updateUserInfoRequest) {
+        String username = authentication.getName();
+        return userService.updateUserInfo(username, updateUserInfoRequest);
+    }
+
+    @PutMapping("/me")
+    @PreAuthorize("hasAnyRole('GUIDE', 'TOURIST')")
+    public UserInfo updateMyInfo(Authentication authentication, @RequestBody UpdateUserInfoRequest updateUserInfoRequest) {
+        return updateUserInfo(authentication, updateUserInfoRequest);
     }
 
 }

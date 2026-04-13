@@ -14,6 +14,7 @@ type Blog struct {
 	CreatedAt   time.Time `json:"created_at"`
 	ImageURL    []string  `json:"image_url" gorm:"type:jsonb"`
 	AuthorID    string    `json:"authorId"`
+	LikesCount  int64     `json:"likesCount" gorm:"-"`
 }
 
 func (blog *Blog) BeforeCreate(tx *gorm.DB) (err error) {
