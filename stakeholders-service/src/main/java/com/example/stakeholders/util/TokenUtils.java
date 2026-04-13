@@ -61,14 +61,15 @@ public class TokenUtils {
     /**
      * Funkcija za generisanje JWT tokena.
      *
-     * @param username Korisničko ime korisnika kojem se token izdaje
+     * @param user Korisnik kojem se token izdaje
      * @return JWT token
      */
-    public String generateToken(String username) {
+    public String generateToken(User user) {
         return Jwts.builder()
                 .setIssuer(APP_NAME)
-                .setSubject(username)
+                .setSubject(user.getUsername())
                 .setAudience(generateAudience())
+                .claim("userId", user.getId())
                 .setIssuedAt(new Date())
                 .setExpiration(generateExpirationDate())
                 .signWith(getSigningKey(), SIGNATURE_ALGORITHM).compact();
