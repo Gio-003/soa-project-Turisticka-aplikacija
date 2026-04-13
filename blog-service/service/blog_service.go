@@ -17,8 +17,8 @@ func (s *BlogService) CreateBlog(createBlogDto *dto.CreateBlogDTO, authorId stri
 	blog := &models.Blog{
 		Title:       createBlogDto.Title,
 		Description: createBlogDto.Description,
-		//ImageURL:    createBlogDto.ImageURL,
-		AuthorID: authorId,
+		ImageURL:    createBlogDto.ImageURL,
+		AuthorID:    authorId,
 	}
 	err := s.Repository.CreateBlog(blog)
 	if err != nil {

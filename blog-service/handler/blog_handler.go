@@ -24,7 +24,7 @@ func (h *BlogHandler) CreateBlog(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
-	autorId := "123" // This should be replaced with actual logic to get the author ID, e.g., from authentication context
+	autorId := GetUserIDFromRequest(r) // This should be replaced with actual logic to get the author ID, e.g., from authentication context
 	blog, err := h.Service.CreateBlog(&createBlogDto, autorId)
 	if err != nil {
 		http.Error(w, "Failed to create blog", http.StatusInternalServerError)
