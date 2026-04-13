@@ -24,7 +24,7 @@ func (h *LikeHandler) LikeBlog(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	blogID := vars["blogId"]
-	userID := getUserIDFromRequest(r)
+	userID := GetUserIDFromRequest(r)
 
 	likesCount, err := h.Service.LikeBlog(blogID, userID)
 	if err != nil {
@@ -54,7 +54,7 @@ func (h *LikeHandler) UnlikeBlog(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	blogID := vars["blogId"]
-	userID := getUserIDFromRequest(r)
+	userID := GetUserIDFromRequest(r)
 
 	likesCount, err := h.Service.UnlikeBlog(blogID, userID)
 	if err != nil {
@@ -72,7 +72,7 @@ func (h *LikeHandler) UnlikeBlog(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]int64{"likesCount": likesCount})
 }
 
-func getUserIDFromRequest(r *http.Request) string {
+func GetUserIDFromRequest(r *http.Request) string {
 	authHeader := r.Header.Get("Authorization")
 	if strings.HasPrefix(authHeader, "Bearer ") {
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
