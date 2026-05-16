@@ -1,8 +1,23 @@
 version: "3.8"
 
 services:
+   api-gateway:
+    build:
+      context: ./api-gateway
+    container_name: api_gateway
+    depends_on:
+      - blog-service
+      - stakeholders-service
+    ports:
+      - "8000:8000"
+    environment:
+      BLOG_SERVICE_URL: "http://blog-service:8080"
+      STAKEHOLDERS_SERVICE_URL: "http://stakeholders-service:8080"
+      JWT_SECRET: "your-secret-key-change-in-production"
+    networks:
+      - tourapp-network
 
-  blog-service:
+   blog-service:
     build:
       context: ./blog-service
     container_name: blog_service
@@ -12,11 +27,14 @@ services:
     environment:
       - PORT=8080
       - MONGO_URI=mongodb://root:pass@mongo:27017/blogdb?authSource=admin
+    networks:
+      - tourapp-network
     depends_on:
       mongo:
         condition: service_healthy
+    
 
-  mongo:
+   mongo:
     image: mongo:7
     container_name: blog_mongo
     restart: always
@@ -33,8 +51,10 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+    networks:
+      - tourapp-network
 
-  mongo-express:
+   mongo-express:
     image: mongo-express
     container_name: blog_mongo_express
     restart: always
@@ -49,8 +69,11 @@ services:
     depends_on:
       mongo:
         condition: service_healthy
+    networks:
+      - tourapp-network
+      
 
-  stakeholders-service:
+   stakeholders-service:
     build:
       context: ./stakeholders-service
     container_name: stakeholders_service
@@ -64,8 +87,10 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/stakeholders_db
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: root
+    networks:
+      - tourapp-network
 
-  postgres:
+   postgres:
     image: postgres:13-alpine
     container_name: stakeholders_postgres
     restart: always
@@ -83,6 +108,15 @@ services:
       timeout: 5s
       retries: 10
 
+    networks:
+      - tourapp-network
+
 volumes:
   mongo_data:
   postgres_data:
+    
+
+
+networks:
+  tourapp-network:
+    driver: bridge
