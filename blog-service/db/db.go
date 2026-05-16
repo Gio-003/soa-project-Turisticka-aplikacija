@@ -1,30 +1,62 @@
 package db
 
 import (
-	"blog-service/models"
-	"fmt"
+	"context"
 	"log"
 	"os"
+	"time"
 
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-func InitDB() *gorm.DB {
-	dsn := os.Getenv("DB_CONNECTION_STRING")
+type MongoClient struct {
+	Client *mongo.Client
+}
 
-	if dsn == "" {
-		dsn = "host=postgres user=postgres password=root dbname=blog_service port=5432"
-		log.Println("DB_CONNECTION_STRING not set, using default local DSN.")
+func InitDB() *MongoClient {
+	mongoURI := os.Getenv("MONGO_URI")
+
+	if mongoURI == "" {
+		// Fallback na lokalnu instancu ako varijabla nije postavljena
+		mongoURI = "mongodb://localhost:27017"
+		log.Println("MONGO_URI not set, using default local URI.")
 	}
 
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	// Postavljanje opcija za klijenta
+	clientOptions := options.Client().ApplyURI(mongoURI)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	// Povezivanje na MongoDB
+	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
+		log.Fatalf("Failed to connect to MongoDB: %v", err)
 		return nil
 	}
 
-	fmt.Println("Database connection successful.")
-	db.AutoMigrate(&models.Blog{}, &models.Comment{}, &models.Like{})
-	return db
+	log.Println("Successfully connected to MongoDB!")
+	return &MongoClient{Client: client}
+}
+
+func (client *MongoClient) Disconnect(ctx context.Context) error {
+	err := client.Client.Disconnect(ctx)
+	if err != nil {
+		log.Fatalf("Failed to disconnect from MongoDB: %v", err)
+		return err
+	}
+	log.Println("Successfully disconnected from MongoDB!")
+	return nil
+}
+
+func (client *MongoClient) Ping() {
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	err := client.Client.Ping(ctx, readpref.Primary())
+	if err != nil {
+		log.Fatalf("Failed to ping MongoDB: %v", err)
+	}
+	log.Println("Successfully pinged MongoDB!")
+
 }

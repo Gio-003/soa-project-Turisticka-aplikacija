@@ -4,13 +4,10 @@ import (
 	"blog-service/dto"
 	"blog-service/models"
 	"blog-service/repo"
-
-	"github.com/google/uuid"
 )
 
 type BlogService struct {
-	Repository     *repo.BlogRepository
-	LikeRepository *repo.LikeRepository
+	Repository *repo.BlogRepository
 }
 
 func (s *BlogService) CreateBlog(createBlogDto *dto.CreateBlogDTO, authorId string) (*models.Blog, error) {
@@ -20,46 +17,36 @@ func (s *BlogService) CreateBlog(createBlogDto *dto.CreateBlogDTO, authorId stri
 		ImageURL:    createBlogDto.ImageURL,
 		AuthorID:    authorId,
 	}
-	err := s.Repository.CreateBlog(blog)
+	err := s.Repository.Create(blog)
 	if err != nil {
 		return nil, err
 	}
-	blog.LikesCount = 0
 	return blog, nil
 }
 
 func (s *BlogService) GetBlogByID(blogID string) (*models.Blog, error) {
-	blogUUID, err := uuid.Parse(blogID)
-	if err != nil {
-		return nil, err
-	}
-	blog, err := s.Repository.GetByID(blogUUID)
-	if err != nil {
-		return nil, err
-	}
-	if s.LikeRepository != nil {
-		likesCount, err := s.LikeRepository.CountByBlogID(blog.ID)
-		if err != nil {
-			return nil, err
-		}
-		blog.LikesCount = likesCount
-	}
-	return blog, nil
+	// Repozitorijum sada interno konvertuje string u ObjectID
+	return s.Repository.GetByID(blogID)
 }
 
+// GetAllBlogs vraća sve blogove.
 func (s *BlogService) GetAllBlogs() ([]models.Blog, error) {
-	blogs, err := s.Repository.GetAll()
-	if err != nil {
-		return nil, err
+	return s.Repository.GetAll()
+}
+
+// LikeBlog poziva metodu za lajkovanje iz repozitorijuma.
+func (s *BlogService) LikeBlog(blogID, userID string) error {
+	return s.Repository.Like(blogID, userID)
+}
+func (s *BlogService) UnlikeBlog(blogID, userID string) error {
+	return s.Repository.Unlike(blogID, userID)
+}
+
+// AddComment poziva metodu za dodavanje komentara iz repozitorijuma.
+func (s *BlogService) AddComment(blogID string, createCommentDTO *dto.CommentDTO, authorId string) error {
+	comment := &models.Comment{
+		Content:  createCommentDTO.Content,
+		AuthorID: authorId,
 	}
-	if s.LikeRepository != nil {
-		for i := range blogs {
-			likesCount, countErr := s.LikeRepository.CountByBlogID(blogs[i].ID)
-			if countErr != nil {
-				return nil, countErr
-			}
-			blogs[i].LikesCount = likesCount
-		}
-	}
-	return blogs, nil
+	return s.Repository.AddComment(blogID, comment)
 }

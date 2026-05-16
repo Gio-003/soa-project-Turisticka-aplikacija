@@ -2,75 +2,74 @@ package handler
 
 import (
 	"blog-service/service"
-	"encoding/json"
+
 	"fmt"
 	"net/http"
 	"os"
 	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/gorilla/mux"
 )
 
 type LikeHandler struct {
-	Service *service.LikeService
+	Service *service.BlogService
 }
 
-func (h *LikeHandler) LikeBlog(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
+// func (h *LikeHandler) LikeBlog(w http.ResponseWriter, r *http.Request) {
+// 	if r.Method != http.MethodPost {
+// 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+// 		return
+// 	}
 
-	vars := mux.Vars(r)
-	blogID := vars["blogId"]
-	userID := GetUserIDFromRequest(r)
+// 	vars := mux.Vars(r)
+// 	blogID := vars["blogId"]
+// 	userID := GetUserIDFromRequest(r)
 
-	likesCount, err := h.Service.LikeBlog(blogID, userID)
-	if err != nil {
-		switch err {
-		case service.ErrLikeAlreadyExists:
-			http.Error(w, err.Error(), http.StatusConflict)
-			return
-		case service.ErrBlogNotFound:
-			http.Error(w, err.Error(), http.StatusNotFound)
-			return
-		default:
-			http.Error(w, "Failed to like blog", http.StatusInternalServerError)
-			return
-		}
-	}
+// 	likesCount, err := h.Service.LikeBlog(blogID, userID)
+// 	if err != nil {
+// 		switch err {
+// 		case service.ErrLikeAlreadyExists:
+// 			http.Error(w, err.Error(), http.StatusConflict)
+// 			return
+// 		case service.ErrBlogNotFound:
+// 			http.Error(w, err.Error(), http.StatusNotFound)
+// 			return
+// 		default:
+// 			http.Error(w, "Failed to like blog", http.StatusInternalServerError)
+// 			return
+// 		}
+// 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(map[string]int64{"likesCount": likesCount})
-}
+// 	w.Header().Set("Content-Type", "application/json")
+// 	w.WriteHeader(http.StatusCreated)
+// 	json.NewEncoder(w).Encode(map[string]int64{"likesCount": likesCount})
+// }
 
-func (h *LikeHandler) UnlikeBlog(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodDelete {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
+// func (h *LikeHandler) UnlikeBlog(w http.ResponseWriter, r *http.Request) {
+// 	if r.Method != http.MethodDelete {
+// 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+// 		return
+// 	}
 
-	vars := mux.Vars(r)
-	blogID := vars["blogId"]
-	userID := GetUserIDFromRequest(r)
+// 	vars := mux.Vars(r)
+// 	blogID := vars["blogId"]
+// 	userID := GetUserIDFromRequest(r)
 
-	likesCount, err := h.Service.UnlikeBlog(blogID, userID)
-	if err != nil {
-		switch err {
-		case service.ErrLikeNotFound:
-			http.Error(w, err.Error(), http.StatusNotFound)
-			return
-		default:
-			http.Error(w, "Failed to unlike blog", http.StatusInternalServerError)
-			return
-		}
-	}
+// 	likesCount, err := h.Service.UnlikeBlog(blogID, userID)
+// 	if err != nil {
+// 		switch err {
+// 		case service.ErrLikeNotFound:
+// 			http.Error(w, err.Error(), http.StatusNotFound)
+// 			return
+// 		default:
+// 			http.Error(w, "Failed to unlike blog", http.StatusInternalServerError)
+// 			return
+// 		}
+// 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]int64{"likesCount": likesCount})
-}
+// 	w.Header().Set("Content-Type", "application/json")
+// 	json.NewEncoder(w).Encode(map[string]int64{"likesCount": likesCount})
+// }
 
 func GetUserIDFromRequest(r *http.Request) string {
 	authHeader := r.Header.Get("Authorization")
