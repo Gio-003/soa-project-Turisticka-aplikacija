@@ -1,6 +1,20 @@
-version: '3.8'
-
 services:
+  api-gateway:
+    build:
+      context: ./api-gateway
+    container_name: api_gateway
+    depends_on:
+      - blog-service
+      - stakeholders-service
+    ports:
+      - "8000:8000"
+    environment:
+      BLOG_SERVICE_URL: "http://blog-service:8080"
+      STAKEHOLDERS_SERVICE_URL: "http://stakeholders-service:8080"
+      JWT_SECRET: "your-secret-key-change-in-production"
+    networks:
+      - tourapp-network
+
   postgres:
     image: postgres:13-alpine
     container_name: blog_db
@@ -18,6 +32,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - tourapp-network
 
   blog-service:
     build:
@@ -30,6 +46,8 @@ services:
       - "8080:8080"
     environment:
       DB_CONNECTION_STRING: "host=postgres user=postgres password=root dbname=blog_service port=5432"
+    networks:
+      - tourapp-network
 
   stakeholders-service:
     build:
@@ -43,7 +61,13 @@ services:
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/stakeholders_db
       SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: root    
+      SPRING_DATASOURCE_PASSWORD: root
+    networks:
+      - tourapp-network
 
 volumes:
   postgres_data:
+
+networks:
+  tourapp-network:
+    driver: bridge
