@@ -1,121 +1,77 @@
 version: "3.8"
 
 services:
-   api-gateway:
-    build:
-      context: ./api-gateway
-    container_name: api_gateway
-    depends_on:
-      - blog-service
-      - stakeholders-service
-    ports:
-      - "8000:8000"
+
+  postgres:
+    image: postgres:13-alpine
+    container_name: main_postgres
+    restart: always
     environment:
-      BLOG_SERVICE_URL: "http://blog-service:8080"
-      STAKEHOLDERS_SERVICE_URL: "http://stakeholders-service:8080"
-      JWT_SECRET: "your-secret-key-change-in-production"
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data 
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     networks:
       - tourapp-network
 
-   blog-service:
+  blog-service:
     build:
       context: ./blog-service
-    container_name: blog_service
-    restart: always
     ports:
       - "8080:8080"
     environment:
-      - PORT=8080
-      - MONGO_URI=mongodb://root:pass@mongo:27017/blogdb?authSource=admin
+      MONGO_URI: mongodb://root:pass@mongo:27017/blogdb?authSource=admin
+    depends_on:
+      - mongo
     networks:
       - tourapp-network
-    depends_on:
-      mongo:
-        condition: service_healthy
-    
 
-   mongo:
+  mongo:
     image: mongo:7
-    container_name: blog_mongo
-    restart: always
     ports:
       - "27017:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: pass
-      MONGO_INITDB_DATABASE: blogdb
-    volumes:
-      - mongo_data:/data/db
-    healthcheck:
-      test: echo 'db.runCommand("ping").ok'
-      interval: 10s
-      timeout: 5s
-      retries: 10
     networks:
       - tourapp-network
 
-   mongo-express:
-    image: mongo-express
-    container_name: blog_mongo_express
-    restart: always
-    ports:
-      - "8082:8081"
-    environment:
-      ME_CONFIG_MONGODB_SERVER: mongo
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: pass
-      ME_CONFIG_BASICAUTH_USERNAME: admin
-      ME_CONFIG_BASICAUTH_PASSWORD: admin
-    depends_on:
-      mongo:
-        condition: service_healthy
-    networks:
-      - tourapp-network
-      
-
-   stakeholders-service:
+  stakeholders-service:
     build:
       context: ./stakeholders-service
-    container_name: stakeholders_service
-    restart: always
     ports:
       - "8081:8080"
-    depends_on:
-      postgres:
-        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/stakeholders_db
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: root
+    depends_on:
+      - postgres
     networks:
       - tourapp-network
 
-   postgres:
-    image: postgres:13-alpine
-    container_name: stakeholders_postgres
-    restart: always
+  tour-service:
+    build:
+      context: ./tour-service
     ports:
-      - "5432:5432"
+      - "8082:8080"
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: root
-      POSTGRES_DB: stakeholders_db
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d stakeholders_db"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=tour_db;Username=postgres;Password=root"
+    depends_on:
+      - postgres
     networks:
       - tourapp-network
 
 volumes:
-  mongo_data:
   postgres_data:
-    
-
 
 networks:
   tourapp-network:
