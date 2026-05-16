@@ -30,6 +30,10 @@ type CanReadResponse struct {
 	CanRead bool `json:"canRead"`
 }
 
+type CanCommentResponse struct {
+	CanComment bool `json:"canComment"`
+}
+
 type MessageResponse struct {
 	Message string `json:"message"`
 }
@@ -74,7 +78,7 @@ func (r *FollowerRepository) Unfollow(ctx context.Context, followerID, followedI
 func (r *FollowerRepository) Following(ctx context.Context, followerID string) ([]UserResponse, error) {
 	query := `
 		MATCH (:User {id: $followerId})-[:FOLLOWS]->(followed:User)
-		RETURN followed.id AS id
+		RETURN DISTINCT followed.id AS id
 		ORDER BY id
 	`
 	return r.readUsers(ctx, query, map[string]any{"followerId": followerID})
@@ -83,7 +87,7 @@ func (r *FollowerRepository) Following(ctx context.Context, followerID string) (
 func (r *FollowerRepository) Followers(ctx context.Context, userID string) ([]UserResponse, error) {
 	query := `
 		MATCH (follower:User)-[:FOLLOWS]->(:User {id: $userId})
-		RETURN follower.id AS id
+		RETURN DISTINCT follower.id AS id
 		ORDER BY id
 	`
 	return r.readUsers(ctx, query, map[string]any{"userId": userID})
@@ -143,6 +147,15 @@ func (r *FollowerRepository) readUsers(ctx context.Context, query string, params
 		users = append(users, UserResponse{ID: id})
 	}
 	return users, nil
+}
+
+func (r *FollowerRepository) EnsureSchema(ctx context.Context) error {
+	query := `
+		CREATE CONSTRAINT user_id_unique IF NOT EXISTS
+		FOR (u:User) REQUIRE u.id IS UNIQUE
+	`
+	_, err := neo4j.ExecuteQuery(ctx, r.driver, query, nil, neo4j.EagerResultTransformer, neo4j.ExecuteQueryWithDatabase(""))
+	return err
 }
 
 type FollowerHandler struct {
@@ -235,6 +248,17 @@ func (h *FollowerHandler) CanRead(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, CanReadResponse{CanRead: canRead})
 }
 
+func (h *FollowerHandler) CanComment(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	canComment, err := h.repository.IsFollowing(r.Context(), vars["userId"], vars["authorId"])
+	if err != nil {
+		log.Printf("can-comment failed: %v", err)
+		writeError(w, http.StatusInternalServerError, "failed to check comment permission")
+		return
+	}
+	writeJSON(w, http.StatusOK, CanCommentResponse{CanComment: canComment})
+}
+
 func validateFollowRequest(followerID, followedID string) error {
 	if strings.TrimSpace(followerID) == "" || strings.TrimSpace(followedID) == "" {
 		return errors.New("user ids are required")
@@ -279,7 +303,12 @@ func main() {
 		log.Fatalf("failed to connect to Neo4j: %v", err)
 	}
 
-	handler := NewFollowerHandler(NewFollowerRepository(driver))
+	repository := NewFollowerRepository(driver)
+	if err := repository.EnsureSchema(ctx); err != nil {
+		log.Fatalf("failed to ensure Neo4j schema: %v", err)
+	}
+
+	handler := NewFollowerHandler(repository)
 	router := mux.NewRouter()
 	router.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, map[string]string{"status": "healthy", "service": "follower-service"})
@@ -290,7 +319,9 @@ func main() {
 	router.HandleFunc("/followers/{followerId}/followers", handler.Followers).Methods(http.MethodGet)
 	router.HandleFunc("/followers/{followerId}/is-following/{followedId}", handler.IsFollowing).Methods(http.MethodGet)
 	router.HandleFunc("/followers/{userId}/recommendations", handler.Recommendations).Methods(http.MethodGet)
+	// Permission decision endpoints for blog/comment access. Enforcement in blog-service is intentionally out of scope here.
 	router.HandleFunc("/followers/{userId}/can-read/{authorId}", handler.CanRead).Methods(http.MethodGet)
+	router.HandleFunc("/followers/{userId}/can-comment/{authorId}", handler.CanComment).Methods(http.MethodGet)
 
 	log.Printf("Follower service starting on port %s", port)
 	if err := http.ListenAndServe(":"+port, router); err != nil {
