@@ -1,20 +1,26 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-// 1. Dodaj FormsModule ovde u import listu na vrhu
 import { ReactiveFormsModule, FormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SharedModule } from '../../shared/shared.module';
 import { KeyPoint } from '../../shared/map/map.component';
+import { TourService } from '../../services/tour.service';
+
+export interface CreateTourRequest {
+  name: string;
+  description: string;
+  difficulty: string;
+  tags: string[];
+  keyPoints: KeyPoint[]; 
+}
 
 @Component({
   selector: 'app-create-tour',
   standalone: true,
-  // 2. Dodaj FormsModule ovde u imports niz komponente
   imports: [CommonModule, ReactiveFormsModule, FormsModule, SharedModule],
   templateUrl: './create-tour.html',
-  styleUrl: './create-tour.css',
+  styleUrls: ['./create-tour.css']
 })
-export class CreateTour {
-  // ... ostatak tvog TypeScript koda ostaje potpuno isti
+export class CreateTour implements OnInit {
   form!: FormGroup;
   submitted = false;
   notification: any;
@@ -23,11 +29,16 @@ export class CreateTour {
   isPointSelected = false;    
   currentPoint: KeyPoint = { lat: 0, lng: 0, name: '', description: '', image: '' }; 
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private tourService: TourService
+  ) {}
+
+  ngOnInit(): void {
     this.form = this.fb.group({
-      name: [''],
-      description: [''],
-      difficulty: [''],
+      name: ['', Validators.required],
+      description: ['', Validators.required],
+      difficulty: ['', Validators.required],
       tags: ['']
     });
   }
@@ -54,7 +65,8 @@ export class CreateTour {
     this.currentPoint = { lat: 0, lng: 0, name: '', description: '', image: '' };
   }
   
-  onSubmit() {
+  onSubmit(): void {
+    // Provera validnosti forme I da li postoji bar jedna ključna tačka
     if (this.form.invalid || this.keyPoints.length === 0) {
       this.notification = {
         msgType: 'error',
@@ -64,19 +76,40 @@ export class CreateTour {
     }
 
     this.submitted = true;
+    const formValue = this.form.value;
 
-    const tourData = {
-      ...this.form.value,
-      keyPoints: this.keyPoints
+    // Mapiramo podatke i parsiramo tagove u niz stringova
+    const request: CreateTourRequest = {
+      name: formValue.name,
+      description: formValue.description,
+      difficulty: formValue.difficulty,
+      tags: formValue.tags
+        ? formValue.tags.split(',').map((t: string) => t.trim())
+        : [],
+      keyPoints: this.keyPoints // Sakupljene tačke sa mape ubacujemo u zahtev
     };
 
-    console.log('Podaci spremni za backend:', tourData);
+    // Slanje na backend preko servisa
+    this.tourService.createTour(request).subscribe({
+      next: () => {
+        this.notification = {
+          msgType: 'success',
+          msgBody: 'Tour created successfully!'
+        };
 
-    this.notification = {
-      msgType: 'success',
-      msgBody: 'Tour created successfully!'
-    };
+        // Resetujemo formu i praznimo tačke sa mape nakon uspešnog čuvanja
+        this.form.reset();
+        this.keyPoints = []; 
+        this.submitted = false;
+      },
+      error: () => {
+        this.notification = {
+          msgType: 'error',
+          msgBody: 'Failed to create tour'
+        };
 
-    this.submitted = false;
+        this.submitted = false;
+      }
+    });
   }
 }

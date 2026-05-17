@@ -10,13 +10,10 @@ namespace tour_service.Data
         {
         }
 
-        // EXISTING
+        // DbSets
         public DbSet<KeyPoints> KeyPoints { get; set; }
-
-        // NEW
         public DbSet<Tour> Tours { get; set; }
         public DbSet<TourTag> TourTags { get; set; }
-        //public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -25,7 +22,7 @@ namespace tour_service.Data
             base.OnModelCreating(modelBuilder);
 
             // =========================
-            // KEYPOINTS (existing)
+            // KEYPOINTS
             // =========================
             modelBuilder.Entity<KeyPoints>(entity =>
             {
@@ -34,9 +31,17 @@ namespace tour_service.Data
                 entity.Property(e => e.Name).IsRequired();
                 entity.Property(e => e.Description).IsRequired();
                 entity.Property(e => e.ImageUrl).IsRequired();
+
                 entity.Property(e => e.TourId).IsRequired();
+
                 entity.Property(e => e.Longitude).IsRequired();
                 entity.Property(e => e.Latitude).IsRequired();
+
+                // RELATION: KeyPoints -> Tour
+                entity.HasOne(kp => kp.Tour)
+                      .WithMany(t => t.KeyPoints)
+                      .HasForeignKey(kp => kp.TourId)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
 
             // =========================
@@ -57,12 +62,6 @@ namespace tour_service.Data
                 entity.Property(t => t.Status)
                       .IsRequired();
 
-                // RELATION: Tour -> KeyPoints (ako KeyPoints pripada turi)
-                entity.HasMany<KeyPoints>()
-                      .WithOne()
-                      .HasForeignKey(kp => kp.TourId)
-                      .OnDelete(DeleteBehavior.Cascade);
-
                 // RELATION: Tour -> Tags
                 entity.HasMany(t => t.Tags)
                       .WithOne(tt => tt.Tour)
@@ -81,21 +80,6 @@ namespace tour_service.Data
 
                 entity.Property(t => t.TourId).IsRequired();
             });
-
-            // =========================
-            // USER
-            // =========================
-            /*modelBuilder.Entity<User>(entity =>
-            {
-                entity.HasKey(u => u.Id);
-
-                entity.Property(u => u.Username).IsRequired();
-
-                entity.HasMany(u => u.Tours)
-                      .WithOne(t => t.Author)
-                      .HasForeignKey(t => t.AuthorId)
-                      .OnDelete(DeleteBehavior.Restrict);
-            });*/
         }
     }
 }
