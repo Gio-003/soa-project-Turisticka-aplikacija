@@ -1,11 +1,14 @@
 package com.example.stakeholders.dto;
 
+import com.example.stakeholders.model.RoleType;
+
 public class UserInfo {
     private String firstName;
     private String lastName;
     private String profilePicture;
     private String biography;
     private String moto;
+    private RoleType role;
 
     public String getFirstName() {
         return firstName;
@@ -45,5 +48,13 @@ public class UserInfo {
 
     public void setMoto(String moto) {
         this.moto = moto;
+    }
+
+    public RoleType getRole() {
+        return role;
+    }
+
+    public void setRole(RoleType role) {
+        this.role = role;
     }
 }

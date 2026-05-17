@@ -1,0 +1,38 @@
+<p>create tour works!</p>
+
+<div class="tour-wrapper">
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="form-container">
+
+      <h2>Create Tour</h2>
+
+      <label>Tour Name</label>
+      <input type="text" formControlName="name" placeholder="Enter tour name" />
+
+      <label>Description</label>
+      <textarea formControlName="description" placeholder="Enter tour description"></textarea>
+
+      <label>Difficulty</label>
+      <select formControlName="difficulty" class="select-field">
+        <option value="" disabled selected hidden>Select difficulty</option>
+        <option value="EASY">Easy</option>
+        <option value="MEDIUM">Medium</option>
+        <option value="HARD">Hard</option>
+      </select>
+
+      <label>Tags</label>
+      <input type="text" formControlName="tags" placeholder="e.g. nature, hiking, mountain" />
+
+      <p *ngIf="notification" [class]="notification.msgType">
+        {{ notification.msgBody }}
+      </p>
+
+      <button type="submit" [disabled]="submitted">
+        Create Tour
+      </button>
+
+    </div>
+  </form>
+
+</div>

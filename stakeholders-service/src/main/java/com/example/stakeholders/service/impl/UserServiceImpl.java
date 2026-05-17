@@ -81,6 +81,7 @@ public class UserServiceImpl implements UserService {
         userInfo.setProfilePicture(user.getProfilePicture());
         userInfo.setBiography(user.getBiography());
         userInfo.setMoto(user.getMoto());
+        userInfo.setRole(user.getRole());
         return userInfo;
     }
 

@@ -14,9 +14,9 @@ import { CommonModule } from '@angular/common';
 export class Navbar {
   constructor(
     private router: Router,
-    private userService: UserService, 
+    public userService: UserService,
     private authService: AuthService,
-  ) {}
+  ) { }
 
   goToLogin(): void {
     this.router.navigate(['/login']);
@@ -34,7 +34,7 @@ export class Navbar {
   hasSignedIn() {
     return !!this.userService.currentUser;
   }
-  
+
   goHome(): void {
     this.router.navigate(['/videos']); // Pretpostavka da je ruta '/videos'
   }
@@ -43,7 +43,7 @@ export class Navbar {
     this.authService.logout();
   }
 
-  goToPasswordManager(): void {
-    this.router.navigate(['/password-manager']);
+  goToGuidePanel(): void {
+    this.router.navigate(['/tours/create']);
   }
 }
