@@ -1,0 +1,48 @@
+<p>registration works!</p>
+<div class="registration-wrapper">
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="form-container">
+
+            <h2>Registration</h2>
+
+            <label>First Name</label>
+            <input type="text" formControlName="firstname" placeholder="Enter your name" />
+
+            <label>Last Name</label>
+            <input type="text" formControlName="lastname" placeholder="Enter your surname" />
+
+            <label>Username</label>
+            <input type="text" formControlName="username" placeholder="Enter your username" />
+
+            <label>Email</label>
+            <input type="email" formControlName="email" placeholder="Enter your email" />
+
+            <label>Password</label>
+            <input type="password" formControlName="password" placeholder="Enter password" />
+
+            <div class="strength-bar">
+                <div [style.width.%]="passwordStrength * 20" [ngClass]="{
+      'weak': passwordStrength <= 2,
+      'medium': passwordStrength === 3,
+      'strong': passwordStrength >= 4
+        }">
+                </div>
+            </div>
+
+            <label>Confirm Password</label>
+            <input type="password" formControlName="confirmPassword" placeholder="Confirm password" />
+
+            <label>Role</label>
+            <select formControlName="role" class="select-field">
+                <option value="" disabled selected hidden>Select role</option>
+                <option value="GUIDE">Guide</option>
+                <option value="TOURIST">Tourist</option>
+            </select>
+
+            <p *ngIf="notification" [class]="notification.msgType">{{notification.msgBody}}</p>
+
+            <button type="submit" [disabled]="submitted">Register</button>
+        </div>
+    </form>
+</div>

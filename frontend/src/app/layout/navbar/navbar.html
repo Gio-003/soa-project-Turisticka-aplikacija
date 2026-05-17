@@ -1,0 +1,15 @@
+<nav class="navbar">
+    <div class="navbar-left" style="cursor: pointer;" (click)="goHome()">
+        TravelApp
+    </div>
+    <div class="navbar-right">
+        <button class="btn login-btn" *ngIf="!hasSignedIn()" (click)="goToLogin()">Log in</button>
+        <button class="btn signup-btn" *ngIf="!hasSignedIn()" (click)="goToSignup()">Sign up</button>
+        <button class="btn logout-btn" *ngIf="hasSignedIn()" (click)="logout()">Log out</button>
+        <button class="btn login-btn" *ngIf="hasSignedIn() && userService.currentUser?.role === 'GUIDE'"
+            (click)="goToGuidePanel()">
+            Create tour
+        </button>
+        <div *ngIf="hasSignedIn()">Hello, {{userName()}}</div>
+    </div>
+</nav>
