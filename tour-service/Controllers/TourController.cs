@@ -45,5 +45,11 @@ namespace MyApp.Controllers
 
             return Ok(tours);
         }
+        [HttpGet("all")]
+        public IActionResult GetAllTours()
+        {
+            var tours = _tourService.GetAllTours();
+            return Ok(tours);
+        }
     }
 }

@@ -3,16 +3,19 @@ using tour_service.Data;
 using tour_service.DTO;
 using tour_service.Enum;
 using tour_service.Models;
+using tour_service.Repositories;
 
 namespace tour_service.Services
 {
     public class TourService
     {
         private readonly AppDbContext _context;
+        private readonly TourRepository _repository;
 
-        public TourService(AppDbContext context)
+        public TourService(AppDbContext context, TourRepository tourRepository)
         {
             _context = context;
+            _repository = tourRepository;
         }
 
         // CREATE TOUR
@@ -36,8 +39,8 @@ namespace tour_service.Services
                         Name = tag
                     }).ToList()
                     : new List<TourTag>(),
-            
-            KeyPoints = request.KeyPoints != null
+
+                KeyPoints = request.KeyPoints != null
                     ? request.KeyPoints.Select(kp => new KeyPoints
                     {
                         Id = Guid.NewGuid(),
@@ -50,7 +53,7 @@ namespace tour_service.Services
                     : new List<KeyPoints>()
             };
 
-        _context.Tours.Add(tour);
+            _context.Tours.Add(tour);
             _context.SaveChanges();
 
             return tour;
@@ -75,6 +78,10 @@ namespace tour_service.Services
                     Tags = t.Tags.Select(tag => tag.Name).ToList()
                 })
                 .ToList();
+        }
+        public List<Tour> GetAllTours()
+        {
+            return _repository.GetAll();
         }
     }
 }
