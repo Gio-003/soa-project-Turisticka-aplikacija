@@ -20,6 +20,7 @@ namespace tour_service.Services
         {
             var tour = new Tour
             {
+                Id = Guid.NewGuid(),
                 Name = request.Name,
                 Description = request.Description,
                 Difficulty = request.Difficulty,
@@ -34,10 +35,22 @@ namespace tour_service.Services
                     {
                         Name = tag
                     }).ToList()
-                    : new List<TourTag>()
+                    : new List<TourTag>(),
+            
+            KeyPoints = request.KeyPoints != null
+                    ? request.KeyPoints.Select(kp => new KeyPoints
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = kp.Name,
+                        Description = kp.Description,
+                        ImageUrl = kp.Image, // 'image' sa fronta ide u 'ImageUrl' u bazi
+                        Latitude = kp.Lat,   // 'lat' sa fronta ide u 'Latitude' u bazi
+                        Longitude = kp.Lng   // 'lng' sa fronta ide u 'Longitude' u bazi
+                    }).ToList()
+                    : new List<KeyPoints>()
             };
 
-            _context.Tours.Add(tour);
+        _context.Tours.Add(tour);
             _context.SaveChanges();
 
             return tour;
@@ -48,6 +61,7 @@ namespace tour_service.Services
         {
             return _context.Tours
                 .Include(t => t.Tags)
+                .Include(t => t.KeyPoints)
                 .Where(t => t.AuthorId == authorId)
                 .Select(t => new TourResponse
                 {
