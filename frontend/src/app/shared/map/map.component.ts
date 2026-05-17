@@ -116,7 +116,7 @@ export class MapComponent implements AfterViewInit, OnChanges {
 
     this.routeControl = L.Routing.control({
       waypoints: waypoints,
-     
+      
       addWaypoints: false, // Korisnik ne može sam da prevlači i dodaje tačke na ruti
     }).addTo(this.map);
 
