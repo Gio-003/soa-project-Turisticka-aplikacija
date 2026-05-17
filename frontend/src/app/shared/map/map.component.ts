@@ -1,10 +1,10 @@
 import { Component, AfterViewInit, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import * as L from 'leaflet';
-import 'leaflet-routing-machine'; // Obavezno uvezi routing plugin ako već nisi
+import 'leaflet-routing-machine'; 
 import { MapService } from './map.service';
 
-// Definišemo interfejs za ključnu tačku radi lakšeg rada sa podacima
 export interface KeyPoint {
+  id?: string;
   lat: number;
   lng: number;
   name?: string;
@@ -23,13 +23,12 @@ export class MapComponent implements AfterViewInit, OnChanges {
   private routeControl: any;
   private markers: L.Marker[] = [];
 
-  // --- INPUTI (Podaci koje komponenta prima od roditelja) ---
-  @Input() mode: 'create' | 'view' = 'create'; // Mod rada komponente
-  @Input() tourPoints: KeyPoint[] = []; // Tačke koje treba prikazati u 'view' modu
-
-  // --- OUTPUTI (Događaji koje komponenta šalje roditelju) ---
-  @Input() center: [number, number] = [45.2396, 19.8227]; // Default: Novi Sad
-  @Output() onPointSelected = new EventEmitter<KeyPoint>(); // Šalje kliknutu lokaciju
+  @Input() mode: 'create' | 'view' | 'edit' = 'view'; 
+  @Input() tourPoints: KeyPoint[] = []; 
+  @Input() center: [number, number] = [45.2396, 19.8227]; 
+  
+  @Output() onPointSelected = new EventEmitter<KeyPoint>(); 
+  @Output() onPointMoved = new EventEmitter<{ index: number, lat: number, lng: number }>(); 
 
   constructor(private mapService: MapService) {}
 
@@ -39,144 +38,117 @@ export class MapComponent implements AfterViewInit, OnChanges {
       iconSize: [25, 41],
       iconAnchor: [12, 41]
     });
-
     L.Marker.prototype.options.icon = DefaultIcon;
     this.initMap();
   }
 
-  // Prati promene na @Input poljima (ako roditelj naknadno pošalje nove tačke)
+  // KLJUČNO: Prati dinamičke promene moda i tačaka iz roditeljske komponente
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['tourPoints'] && this.map) {
-      // Prvo brišemo stare markere sa mape
-      this.clearMarkers();
-      
-      // Ako ruter već postoji, sklonimo ga pre iscrtavanja novog rute
-      if (this.routeControl) {
-        this.map.removeControl(this.routeControl);
-      }
+    if (!this.map) return;
 
-      if (this.tourPoints.length > 0) {
-        this.displayTour();
+    // Ako se promenio mod (npr. iz edit prešlo u view), skidamo stare klikove i osvežavamo lejere
+    if (changes['mode']) {
+      this.map.off('click'); 
+      if (this.mode === 'create' || this.mode === 'edit') {
+        this.registerOnClick();
       }
+      this.refreshMapLayers();
+    } 
+    // Ako su se promenile same tačke
+    else if (changes['tourPoints']) {
+      this.refreshMapLayers();
     }
   }
+
   private initMap(): void {
     this.map = L.map('map', {
       center: this.center,
       zoom: 13,
     });
 
-    const tiles = L.tileLayer(
-      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-      {
-        maxZoom: 18,
-        minZoom: 3,
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-      }
-    );
-    tiles.addTo(this.map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      minZoom: 3,
+      attribution: '&copy; OpenStreetMap contributors',
+    }).addTo(this.map);
 
-    // Aktiviraj klik na mapu samo ako smo u modu za kreiranje tačaka
-    if (this.mode === 'create') {
+    if (this.mode === 'create' || this.mode === 'edit') {
       this.registerOnClick();
-    } else if (this.mode === 'view' && this.tourPoints.length > 0) {
+    }
+    
+    if (this.tourPoints.length > 0) {
       this.displayTour();
     }
   }
 
-  // --- METODA ZA REGISTRACIJU KLIKA (Kreiranje tačke) ---
   registerOnClick(): void {
     this.map.on('click', (e: any) => {
-      const coord = e.latlng;
+      if (this.mode !== 'create' && this.mode !== 'edit') return;
       
-      // Brišemo prethodni privremeni marker ako postoji
-      this.clearMarkers();
-
-      // Postavljamo novi marker na mesto klika
-      const marker = new L.Marker([coord.lat, coord.lng]).addTo(this.map);
-      this.markers.push(marker);
-
-      // Šaljemo koordinate roditeljskoj komponenti
-      this.onPointSelected.emit({
-        lat: coord.lat,
-        lng: coord.lng
-      });
+      const coord = e.latlng;
+      this.onPointSelected.emit({ lat: coord.lat, lng: coord.lng });
     });
   }
 
-  // --- PARAMETRIZOVANA METODA ZA RUTU ---
-  setRoute(points: KeyPoint[]): void {
-    // Ako već postoji stara ruta na mapi, ukloni je
+  private refreshMapLayers(): void {
+    this.clearMarkers();
     if (this.routeControl) {
       this.map.removeControl(this.routeControl);
+      this.routeControl = null;
     }
-
-    // Pretvaramo naše tačke u L.latLng objekte koje Leaflet Routing prihvata
-    const waypoints = points.map(p => L.latLng(p.lat, p.lng));
-
-    this.routeControl = L.Routing.control({
-      waypoints: waypoints,
-      
-      addWaypoints: false, // Korisnik ne može sam da prevlači i dodaje tačke na ruti
-    }).addTo(this.map);
-
-    this.routeControl.on('routesfound', (e: any) => {
-      const routes = e.routes;
-      const summary = routes[0].summary;
-      console.log('Udaljenost: ' + summary.totalDistance / 1000 + ' km, Vreme: ' + Math.round(summary.totalTime / 60) + ' min');
-    });
+    if (this.tourPoints.length > 0) {
+      this.displayTour();
+    }
   }
 
-  // Prikazuje sve tačke ture i spaja ih rutom
   private displayTour(): void {
-    this.tourPoints.forEach(point => {
+    this.tourPoints.forEach((point, index) => {
       const popupContent = `
         <strong>${point.name || 'Ključna tačka'}</strong><br>
-        ${point.description || ''}<br>
-        ${point.image ? `<img src="${point.image}" width="100" style="margin-top:5px; border-radius:4px;" />` : ''}
+        ${point.description || ''}
       `;
 
-      const marker = L.marker([point.lat, point.lng])
+      // STROGO KONTROLISANO DRAGGABLE STANJE: samo i isključivo ako je mode 'edit'
+      const isDraggable = this.mode === 'edit';
+
+      const marker = L.marker([point.lat, point.lng], { draggable: isDraggable })
         .addTo(this.map)
         .bindPopup(popupContent);
+        
+      if (isDraggable) {
+        marker.on('dragend', (event: any) => {
+          const newLatLng = event.target.getLatLng();
+          this.onPointMoved.emit({
+            index: index,
+            lat: newLatLng.lat,
+            lng: newLatLng.lng
+          });
+        });
+      }
         
       this.markers.push(marker);
     });
 
-    // Ako imamo više od 1 tačke, iscrtaj rutu između njih
     if (this.tourPoints.length > 1) {
       this.setRoute(this.tourPoints);
     }
-
-    // Centriraj mapu oko prve tačke na turi
-    this.map.setView([this.tourPoints[0].lat, this.tourPoints[0].lng], 13);
   }
 
-  // Pomoćne metode za čišćenje mape
-  private clearMarkers(): void {
-    this.markers.forEach(m => this.map.removeLayer(m));
-    this.markers = [];
-  }
-
-  private clearMap(): void {
-    this.clearMarkers();
+  setRoute(points: KeyPoint[]): void {
     if (this.routeControl) {
       this.map.removeControl(this.routeControl);
     }
+    const waypoints = points.map(p => L.latLng(p.lat, p.lng));
+    this.routeControl = L.Routing.control({
+      waypoints: waypoints,
+      addWaypoints: false, 
+      draggableWaypoints: false,
+      show: false
+    }as any).addTo(this.map);
   }
 
-  // Zadržana metoda za pretragu iz tvog koda, sada je dinamička
-  search(address: string): void {
-    this.mapService.search(address).subscribe({
-      next: (result) => {
-        if(result && result.length > 0) {
-          const lat = result[0].lat;
-          const lon = result[0].lon;
-          this.map.setView([lat, lon], 15);
-          L.marker([lat, lon]).addTo(this.map).bindPopup(address).openPopup();
-        }
-      },
-      error: () => {},
-    });
+  private clearMarkers(): void {
+    this.markers.forEach(m => this.map.removeLayer(m));
+    this.markers = [];
   }
 }

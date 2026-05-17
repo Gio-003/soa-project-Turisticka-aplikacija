@@ -4,7 +4,7 @@ import { LoginComponent } from './stakeholders/login/login';
 import { Home } from './layout/home/home';
 import { Navbar } from './layout/navbar/navbar';
 import { CreateTour } from './tours/create-tour/create-tour';
-import { AllTours } from './tours/all-tours/all-tours';
+import { AllToursComponent } from './tours/all-tours/all-tours';
 
 export const routes: Routes = [
   { path: '', component: Home },
@@ -12,5 +12,5 @@ export const routes: Routes = [
   { path: 'signup', component: Registration },
   { path: 'login', component: LoginComponent },
   { path: 'tours/create', component: CreateTour },
-  { path: 'tours/all', component: AllTours },
+  { path: 'tours/all', component: AllToursComponent },
 ];

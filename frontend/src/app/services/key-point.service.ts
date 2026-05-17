@@ -18,10 +18,16 @@ export class KeyPointService {
 ) { }
 
   addKeyPoint(tourId: string, keyPoint: Omit<KeyPoint, 'id' | 'tourId'>): Observable<KeyPoint> {
-    return this.http.post<KeyPoint>(`${this.config.apiUrl}/tours/${tourId}/keypoints`, keyPoint);
+    return this.http.post<KeyPoint>(`${this.config.tours_url}/${tourId}/keypoints`, keyPoint);
   }
 
   getKeyPointsForTour(tourId: string): Observable<KeyPoint[]> {
-    return this.http.get<KeyPoint[]>(`${this.config.apiUrl}/tours/${tourId}/keypoints`);
+    return this.http.get<KeyPoint[]>(`${this.config.tours_url}/${tourId}/keypoints`);
+  }
+  updateKeyPoint(tourId: string, keyPointId: string, keyPoint: Omit<KeyPoint, 'id' | 'tourId'>): Observable<KeyPoint> {
+    return this.http.put<KeyPoint>(`${this.config.tours_url}/${tourId}/keypoints/${keyPointId}`, keyPoint);
+  }
+  deleteKeyPoint(tourId: string, keyPointId: string): Observable<void> {
+    return this.http.delete<void>(`${this.config.tours_url}/${tourId}/keypoints/${keyPointId}`);
   }
 }

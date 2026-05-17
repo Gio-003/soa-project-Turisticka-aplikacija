@@ -31,4 +31,9 @@ export class TourService {
       this.config.tours_url + '/my'
     );
   }
+  getAllTours() {
+    return this.apiService.get(
+      this.config.tours_url+'/all'
+    );
+  }
 }
