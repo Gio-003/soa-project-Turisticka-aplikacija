@@ -3,6 +3,7 @@ import { AuthService } from './services/auth.service';
 import { UserService } from './services/user.service';
 import { RouterOutlet} from '@angular/router';
 import { Navbar } from './layout/navbar/navbar';
+import 'leaflet-routing-machine';
 
 @Component({
   selector: 'app-root',

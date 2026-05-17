@@ -1,38 +1,78 @@
 <p>create tour works!</p>
 
-<div class="tour-wrapper">
+<div class="create-tour-container">
 
-  <form [formGroup]="form" (ngSubmit)="onSubmit()">
-    <div class="form-container">
+  <!-- LEVA KOLONA: FORMA ZA TURU -->
+  <div class="tour-form-section">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <h2>Create a New Tour</h2>
 
-      <h2>Create Tour</h2>
+      <label for="tourName">Tour Name</label>
+      <input id="tourName" type="text" formControlName="name" placeholder="e.g., Historic City Walk" />
 
-      <label>Tour Name</label>
-      <input type="text" formControlName="name" placeholder="Enter tour name" />
+      <label for="tourDesc">Description</label>
+      <textarea id="tourDesc" formControlName="description" placeholder="A brief description of the tour..."></textarea>
 
-      <label>Description</label>
-      <textarea formControlName="description" placeholder="Enter tour description"></textarea>
-
-      <label>Difficulty</label>
-      <select formControlName="difficulty" class="select-field">
+      <label for="tourDiff">Difficulty</label>
+      <select id="tourDiff" formControlName="difficulty">
         <option value="" disabled selected hidden>Select difficulty</option>
         <option value="EASY">Easy</option>
         <option value="MEDIUM">Medium</option>
         <option value="HARD">Hard</option>
       </select>
 
-      <label>Tags</label>
-      <input type="text" formControlName="tags" placeholder="e.g. nature, hiking, mountain" />
+      <label for="tourTags">Tags</label>
+      <input id="tourTags" type="text" formControlName="tags" placeholder="e.g., history, architecture, food" />
+
+      <!-- PRIKAZ DODATIH KLJUČNIH TAČAKA -->
+      <div class="added-points-list" *ngIf="keyPoints.length > 0">
+        <h4>Added Key Points ({{ keyPoints.length }})</h4>
+        <ul>
+          <li *ngFor="let kp of keyPoints; let i = index">
+            <span>{{ i + 1 }}. {{ kp.name }}</span>
+          </li>
+        </ul>
+      </div>
 
       <p *ngIf="notification" [class]="notification.msgType">
         {{ notification.msgBody }}
       </p>
 
-      <button type="submit" [disabled]="submitted">
+      <button type="submit" class="submit-tour-btn" [disabled]="submitted || keyPoints.length < 2">
         Create Tour
       </button>
+      <small *ngIf="keyPoints.length < 2">Please add at least 2 key points to create a tour.</small>
+    </form>
+  </div>
 
+  <!-- DESNA KOLONA: MAPA I FORMA ZA KLJUČNU TAČKU -->
+  <div class="map-section">
+    <app-map 
+      mode="create" 
+      [tourPoints]="keyPoints" 
+      (onPointSelected)="handlePointSelected($event)">
+    </app-map>
+
+    <div class="keypoint-config-form" [class.visible]="isPointSelected">
+      <h3>Configure Key Point</h3>
+      <p class="coords-info">Coords: {{ currentPoint.lat | number:'1.4-4' }}, {{ currentPoint.lng | number:'1.4-4' }}</p>
+      
+      <label for="kpName">Key Point Name</label>
+      <input id="kpName" type="text" [(ngModel)]="currentPoint.name" placeholder="e.g., National Museum" />
+      
+      <label for="kpDesc">Description</label>
+      <textarea id="kpDesc" [(ngModel)]="currentPoint.description" placeholder="A short description..."></textarea>
+      
+      <label for="kpImage">Image URL</label>
+      <input id="kpImage" type="text" [(ngModel)]="currentPoint.image" placeholder="https://example.com/image.jpg" />
+
+      <button type="button" class="btn-add-point" (click)="addKeyPoint()" [disabled]="!currentPoint.name">
+        + Add this Key Point
+      </button>
     </div>
-  </form>
+    <div class="map-overlay" *ngIf="!isPointSelected">
+      <p>Click on the map to add a key point</p>
+    </div>
+  </div>
 
 </div>
