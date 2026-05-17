@@ -27,6 +27,24 @@ namespace tour_service.Controllers
             var keyPoint = _service.AddKeyPoint(tourId, keyPointDTO);
             return Ok(keyPoint);
         }
+        [HttpPut("{id}")]
+        public IActionResult UpdateKeyPoint(Guid tourId, Guid id, [FromBody] CreateKeyPointDTO dto)
+        {
+            // Pozivamo servis za izmenu
+            var updated = _service.UpdateExistingKeyPoint(id, dto);
+            if (updated == null) return NotFound("Ključna tačka nije pronađena.");
+
+            return Ok(updated);
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteKeyPoint(Guid tourId, Guid id)
+        {
+            var deleted = _service.DeleteKeyPoint(id);
+            if (deleted == null) return NotFound("Ključna tačka nije pronađena.");
+
+            return Ok(new { message = "Uspešno obrisano", id = id });
+        }
 
     }
 }
