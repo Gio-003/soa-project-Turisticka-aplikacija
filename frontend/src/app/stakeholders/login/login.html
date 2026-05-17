@@ -1,0 +1,21 @@
+<form class="login-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div class="form-container">
+
+    <h2>Login</h2>
+
+    <!-- Email -->
+    <label>Email</label>
+    <input type="text" formControlName="username" placeholder="Enter email" />
+
+    <!-- Password -->
+    <label>Password</label>
+    <input type="password" formControlName="password" placeholder="Enter password" />
+
+    <!-- Submit button -->
+    <button type="submit" [disabled]="submitted">Login</button>
+
+    <!-- Error / notification message -->
+    <p *ngIf="notification" [class]="notification.msgType">{{notification.msgBody}}</p>
+
+  </div>
+</form>

@@ -80,7 +80,7 @@ public class WebSecurityConfig {
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/**").permitAll()		// /auth/**
                 .requestMatchers("/h2-console/**").permitAll()	// /h2-console/** ako se koristi H2 baza)
-                .requestMatchers("/api/foo").permitAll()
+                .requestMatchers("/api/**").permitAll()
                 .requestMatchers(
                         "/swagger-ui/**",
                         "/v3/api-docs/**",
