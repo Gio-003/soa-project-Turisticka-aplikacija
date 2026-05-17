@@ -37,9 +37,24 @@ namespace tour_service.Services
             };
             return _repository.Create(keyPoint);
         }
-         public KeyPoints Update(KeyPoints keyPoint)
+        public KeyPoints UpdateExistingKeyPoint(Guid id, CreateKeyPointDTO dto)
         {
-            return _repository.Update(keyPoint);
+            var existing = _repository.GetById(id);
+            if (existing == null) return null;
+
+            // Ažuriramo polja sa novim vrednostima
+            existing.Name = dto.Name;
+            existing.Description = dto.Description;
+            existing.ImageUrl = dto.ImageUrl;
+            existing.Latitude = dto.Latitude;
+            existing.Longitude = dto.Longitude;
+
+            return _repository.Update(existing);
+        }
+
+        public KeyPoints DeleteKeyPoint(Guid id)
+        {
+            return _repository.Delete(id);
         }
     }
 }

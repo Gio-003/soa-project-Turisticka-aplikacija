@@ -100,3 +100,223 @@
   margin-top: 1rem;
   font-weight: bold;
 }
+
+/* --- Glavni kontejner --- */
+.create-tour-container {
+  display: flex;
+  gap: 2rem;
+  padding: 2rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: #f4f7f9;
+  min-height: 100vh;
+}
+
+/* --- Leva kolona: Forma za turu --- */
+.tour-form-section {
+  flex: 1;
+  min-width: 350px;
+  background: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+  align-self: flex-start; /* Da se ne rasteže po visini */
+}
+
+.tour-form-section h2 {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 2rem;
+  color: #2c3e50;
+}
+
+/* --- Desna kolona: Mapa i forma --- */
+.map-section {
+  flex: 1.5;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: relative; /* Za pozicioniranje overlay-a */
+}
+
+app-map {
+  width: 100%;
+  height: 450px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+  border: 2px solid transparent;
+  transition: border-color 0.3s;
+}
+
+/* --- Forma za konfigurisanje ključne tačke --- */
+.keypoint-config-form {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none; /* Onemogućava interakciju kad je sakrivena */
+}
+
+.keypoint-config-form.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.keypoint-config-form h3 {
+  margin-top: 0;
+  text-align: center;
+  color: #2c3e50;
+}
+
+.coords-info {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #7f8c8d;
+  background: #ecf0f1;
+  padding: 8px;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+/* --- Overlay preko mape --- */
+.map-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 450px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.4);
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+  border-radius: 12px;
+  pointer-events: none; /* Da bi se moglo kliknuti "kroz" njega */
+}
+
+/* --- Zajednički stilovi za forme --- */
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #34495e;
+}
+
+input[type="text"],
+textarea,
+select {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 1px solid #bdc3c7;
+  border-radius: 8px;
+  margin-bottom: 1.2rem;
+  font-size: 1rem;
+  box-sizing: border-box;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+input[type="text"]:focus,
+textarea:focus,
+select:focus {
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+  outline: none;
+}
+
+textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+/* --- Dugmad --- */
+button {
+  width: 100%;
+  padding: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 700;
+  transition: background-color 0.3s, transform 0.1s;
+}
+button:hover {
+  transform: translateY(-2px);
+}
+button:disabled {
+  background-color: #bdc3c7 !important;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.submit-tour-btn {
+  background-color: #27ae60;
+  color: white;
+}
+.submit-tour-btn:hover:not(:disabled) {
+  background-color: #229954;
+}
+
+.btn-add-point {
+  background-color: #3498db;
+  color: white;
+}
+.btn-add-point:hover:not(:disabled) {
+  background-color: #2980b9;
+}
+
+/* --- Lista dodatih tačaka --- */
+.added-points-list {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+.added-points-list h4 {
+  margin: 0 0 0.5rem 0;
+  color: #34495e;
+}
+.added-points-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.added-points-list li {
+  padding: 6px 0;
+  color: #7f8c8d;
+}
+
+small {
+  display: block;
+  text-align: center;
+  margin-top: 0.5rem;
+  color: #e74c3c;
+  font-size: 0.85rem;
+}
+
+/* --- Notifikacije --- */
+.success, .error {
+  padding: 1rem;
+  margin-top: 1.5rem;
+  border-radius: 8px;
+  text-align: center;
+}
+.success {
+  background-color: #d4edda;
+  color: #155724;
+}
+.error {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+/* --- Responzivnost --- */
+@media (max-width: 1024px) {
+  .create-tour-container {
+    flex-direction: column;
+  }
+}

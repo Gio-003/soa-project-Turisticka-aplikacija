@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using tour_service.DTO;
 using tour_service.Services;
+using System;
 
 namespace MyApp.Controllers
 {
@@ -18,9 +19,14 @@ namespace MyApp.Controllers
         [HttpPost]
         public IActionResult CreateTour([FromBody] CreateTourRequest request)
         {
-            int authorId = int.Parse(User.FindFirst("id")?.Value);
+            /*var userIdClaim = User.FindFirst("id")?.Value;
 
-            var tourResponse = _tourService.CreateTour(request, authorId);
+            if (!Guid.TryParse(userIdClaim, out Guid authorId))
+            {
+                return Unauthorized("Invalid or missing user id in token.");
+            }*/
+            Guid id = Guid.NewGuid();
+            var tourResponse = _tourService.CreateTour(request, id);
 
             return Ok(tourResponse);
         }
@@ -28,10 +34,21 @@ namespace MyApp.Controllers
         [HttpGet("my")]
         public IActionResult GetMyTours()
         {
-            int authorId = int.Parse(User.FindFirst("id")?.Value);
+            var userIdClaim = User.FindFirst("id")?.Value;
+
+            if (!Guid.TryParse(userIdClaim, out Guid authorId))
+            {
+                return Unauthorized("Invalid or missing user id in token.");
+            }
 
             var tours = _tourService.GetToursByAuthor(authorId);
 
+            return Ok(tours);
+        }
+        [HttpGet("all")]
+        public IActionResult GetAllTours()
+        {
+            var tours = _tourService.GetAllTours();
             return Ok(tours);
         }
     }

@@ -3,23 +3,27 @@ using tour_service.Data;
 using tour_service.DTO;
 using tour_service.Enum;
 using tour_service.Models;
+using tour_service.Repositories;
 
 namespace tour_service.Services
 {
     public class TourService
     {
         private readonly AppDbContext _context;
+        private readonly TourRepository _repository;
 
-        public TourService(AppDbContext context)
+        public TourService(AppDbContext context, TourRepository tourRepository)
         {
             _context = context;
+            _repository = tourRepository;
         }
 
         // CREATE TOUR
-        public Tour CreateTour(CreateTourRequest request, int authorId)
+        public Tour CreateTour(CreateTourRequest request, Guid authorId)
         {
             var tour = new Tour
             {
+                Id = Guid.NewGuid(),
                 Name = request.Name,
                 Description = request.Description,
                 Difficulty = request.Difficulty,
@@ -34,7 +38,19 @@ namespace tour_service.Services
                     {
                         Name = tag
                     }).ToList()
-                    : new List<TourTag>()
+                    : new List<TourTag>(),
+
+                KeyPoints = request.KeyPoints != null
+                    ? request.KeyPoints.Select(kp => new KeyPoints
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = kp.Name,
+                        Description = kp.Description,
+                        ImageUrl = kp.Image, // 'image' sa fronta ide u 'ImageUrl' u bazi
+                        Latitude = kp.Lat,   // 'lat' sa fronta ide u 'Latitude' u bazi
+                        Longitude = kp.Lng   // 'lng' sa fronta ide u 'Longitude' u bazi
+                    }).ToList()
+                    : new List<KeyPoints>()
             };
 
             _context.Tours.Add(tour);
@@ -44,10 +60,11 @@ namespace tour_service.Services
         }
 
         // GET TOURS BY AUTHOR (RETURN DTO, NOT ENTITY)
-        public List<TourResponse> GetToursByAuthor(int authorId)
+        public List<TourResponse> GetToursByAuthor(Guid authorId)
         {
             return _context.Tours
                 .Include(t => t.Tags)
+                .Include(t => t.KeyPoints)
                 .Where(t => t.AuthorId == authorId)
                 .Select(t => new TourResponse
                 {
@@ -61,6 +78,10 @@ namespace tour_service.Services
                     Tags = t.Tags.Select(tag => tag.Name).ToList()
                 })
                 .ToList();
+        }
+        public List<Tour> GetAllTours()
+        {
+            return _repository.GetAll();
         }
     }
 }

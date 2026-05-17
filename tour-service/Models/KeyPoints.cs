@@ -7,6 +7,7 @@
         public string Description { get; set; }
 
         public Guid TourId { get; set; }
+        public Tour Tour { get; set; }
 
         public string ImageUrl { get; set; }
         public double Longitude { get; set; }

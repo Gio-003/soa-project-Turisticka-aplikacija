@@ -1,7 +1,13 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { ApiService } from './api.service';
 import { ConfigService } from './config.service';
-import { Observable } from 'rxjs';
+
+export interface CreateTourRequest {
+  name: string;
+  description: string;
+  difficulty: string;
+  tags: string[];
+}
 
 @Injectable({
   providedIn: 'root'
@@ -9,51 +15,25 @@ import { Observable } from 'rxjs';
 export class TourService {
 
   constructor(
-    private http: HttpClient,
+    private apiService: ApiService,
     private config: ConfigService
   ) {}
 
-  // CREATE TOUR
-  createTour(data: any): Observable<any> {
-    return this.http.post(
-      `${this.config.apiUrl}/tours`,
-      data
+  createTour(request: CreateTourRequest) {
+    return this.apiService.post(
+      this.config.tours_url,
+      request
     );
   }
 
-  // GET ALL TOURS OF LOGGED USER
-  getMyTours(): Observable<any> {
-    return this.http.get(
-      `${this.config.apiUrl}/tours/my`
+  getMyTours() {
+    return this.apiService.get(
+      this.config.tours_url + '/my'
     );
   }
-
-  // GET ALL TOURS (optional admin / browse)
-  getAllTours(): Observable<any> {
-    return this.http.get(
-      `${this.config.apiUrl}/tours`
-    );
-  }
-
-  // GET TOUR BY ID
-  getTourById(id: number): Observable<any> {
-    return this.http.get(
-      `${this.config.apiUrl}/tours/${id}`
-    );
-  }
-
-  // UPDATE TOUR
-  updateTour(id: number, data: any): Observable<any> {
-    return this.http.put(
-      `${this.config.apiUrl}/tours/${id}`,
-      data
-    );
-  }
-
-  // DELETE TOUR
-  deleteTour(id: number): Observable<any> {
-    return this.http.delete(
-      `${this.config.apiUrl}/tours/${id}`
+  getAllTours() {
+    return this.apiService.get(
+      this.config.tours_url+'/all'
     );
   }
 }
