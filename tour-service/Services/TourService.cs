@@ -16,7 +16,7 @@ namespace tour_service.Services
         }
 
         // CREATE TOUR
-        public Tour CreateTour(CreateTourRequest request, int authorId)
+        public Tour CreateTour(CreateTourRequest request, Guid authorId)
         {
             var tour = new Tour
             {
@@ -44,7 +44,7 @@ namespace tour_service.Services
         }
 
         // GET TOURS BY AUTHOR (RETURN DTO, NOT ENTITY)
-        public List<TourResponse> GetToursByAuthor(int authorId)
+        public List<TourResponse> GetToursByAuthor(Guid authorId)
         {
             return _context.Tours
                 .Include(t => t.Tags)

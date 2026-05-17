@@ -3,7 +3,7 @@ namespace tour_service.DTO
 {
     public class TourResponse
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         public string Name { get; set; }
         public string Description { get; set; }
@@ -12,7 +12,7 @@ namespace tour_service.DTO
         public decimal Price { get; set; }
         public TourStatus Status { get; set; }
 
-        public int AuthorId { get; set; }
+        public Guid AuthorId { get; set; }
 
         public List<string> Tags { get; set; }
     }
