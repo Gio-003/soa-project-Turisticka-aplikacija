@@ -1,0 +1,113 @@
+<div class="tour-reviews-container">
+  <h2>Tour Reviews</h2>
+
+  <!-- Loading state -->
+  <div *ngIf="isLoading" class="loading">
+    <p>Loading reviews...</p>
+  </div>
+
+  <!-- Error state -->
+  <div *ngIf="error" class="error-message">
+    <p>{{ error }}</p>
+  </div>
+
+  <!-- Submit review button -->
+  <div class="review-actions">
+    <button (click)="toggleForm()" class="btn-submit-review">
+      {{ showForm ? 'Cancel' : 'Write a Review' }}
+    </button>
+  </div>
+
+  <!-- Review form -->
+  <div *ngIf="showForm" class="review-form">
+    <h3>Share Your Experience</h3>
+
+    <!-- Rating -->
+    <div class="form-group">
+      <label for="rating">Rating (1-5 stars):</label>
+      <div class="rating-input">
+        <input type="range" id="rating" min="1" max="5" [(ngModel)]="rating" class="rating-slider">
+        <span class="rating-value">{{ rating }} / 5</span>
+      </div>
+    </div>
+
+    <!-- Comment -->
+    <div class="form-group">
+      <label for="comment">Comment:</label>
+      <textarea
+        id="comment"
+        [(ngModel)]="comment"
+        placeholder="Share your thoughts about this tour..."
+        class="form-control"
+        rows="4">
+      </textarea>
+    </div>
+
+    <!-- Visit Date -->
+    <div class="form-group">
+      <label for="visitDate">Visit Date:</label>
+      <input
+        type="date"
+        id="visitDate"
+        [(ngModel)]="visitDate"
+        class="form-control">
+    </div>
+
+    <!-- Images -->
+    <div class="form-group">
+      <label>Images (URLs):</label>
+      <div class="image-input-group">
+        <input
+          type="url"
+          [(ngModel)]="imageUrl"
+          placeholder="Enter image URL"
+          class="form-control">
+        <button (click)="addImage()" class="btn-add-image">Add Image</button>
+      </div>
+      <div *ngIf="images.length > 0" class="image-list">
+        <div *ngFor="let img of images; let i = index" class="image-item">
+          <img [src]="img" alt="Review image" class="image-thumbnail">
+          <button (click)="removeImage(i)" class="btn-remove-image">×</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit button -->
+    <button (click)="submitReview()" class="btn-primary">Submit Review</button>
+  </div>
+
+  <!-- Reviews list -->
+  <div *ngIf="!isLoading && reviews.length > 0" class="reviews-list">
+    <h3>Recent Reviews ({{ reviews.length }})</h3>
+    <div *ngFor="let review of reviews" class="review-item">
+      <div class="review-header">
+        <div class="reviewer-info">
+          <h4>{{ review.touristUsername }}</h4>
+          <span class="review-date">{{ formatDate(review.createdAt || '') }}</span>
+        </div>
+        <div class="review-rating">
+          <span class="stars">
+            <span *ngFor="let _ of getRatingStars(review.rating)" class="star filled">★</span>
+            <span *ngFor="let _ of getEmptyStars(review.rating)" class="star">☆</span>
+          </span>
+          <span class="rating-number">{{ review.rating }}/5</span>
+        </div>
+      </div>
+
+      <div class="review-body">
+        <p class="comment">{{ review.comment }}</p>
+        <p class="visit-date">Visited: {{ formatDate(review.visitDate) }}</p>
+      </div>
+
+      <!-- Review images -->
+      <div *ngIf="review.images && review.images.length > 0" class="review-images">
+        <img *ngFor="let img of review.images" [src]="img" alt="Review image" class="review-image">
+      </div>
+    </div>
+  </div>
+
+  <!-- No reviews state -->
+  <div *ngIf="!isLoading && reviews.length === 0" class="no-reviews">
+    <p>No reviews yet. Be the first to share your experience!</p>
+  </div>
+</div>

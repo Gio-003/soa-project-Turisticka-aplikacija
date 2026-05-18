@@ -6,6 +6,7 @@ import { Navbar } from './layout/navbar/navbar';
 import { CreateTour } from './tours/create-tour/create-tour';
 import { AllToursComponent } from './tours/all-tours/all-tours';
 import { MyTours } from './tours/my-tours/my-tours';
+import { BlogComponent } from './blog/blog/blog.component';
 
 export const routes: Routes = [
   { path: '', component: Home },
@@ -15,4 +16,5 @@ export const routes: Routes = [
   { path: 'tours/create', component: CreateTour },
   { path: 'tours/all', component: AllToursComponent },
   { path: 'tours/my', component: MyTours},
+  {path: 'blogs', component: BlogComponent}
 ];

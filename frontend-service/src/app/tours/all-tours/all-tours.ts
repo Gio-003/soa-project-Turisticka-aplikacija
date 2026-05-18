@@ -8,6 +8,7 @@ import { KeyPoint as ApiKeyPoint } from '../../models/key-point.model'; // Model
 import { KeyPoint as MapKeyPoint } from '../../shared/map/map.component'; // Model za mapu
 import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
+import { TourReviewsComponent } from '../tour-reviews/tour-reviews.component';
 
 // Popravljen interfejs: Uklonjen neispravan 'extends ApiKeyPoint'
 export interface Tour {
@@ -22,7 +23,7 @@ export interface Tour {
 @Component({
   selector: 'app-all-tours',
   standalone: true,
-  imports: [CommonModule, FormsModule, SharedModule],
+  imports: [CommonModule, FormsModule, SharedModule, TourReviewsComponent],
   templateUrl: './all-tours.html',
   styleUrls: ['./all-tours.css'],
 })

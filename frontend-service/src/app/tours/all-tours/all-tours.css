@@ -92,6 +92,13 @@ app-map {
   z-index: 1;        /* Postavljamo ga na osnovni sloj */
 }
 
+app-tour-reviews {
+  display: block;
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 2;
+}
+
 /* --- Forma za izmenu/dodavanje --- */
 .kp-form-container {
   background-color: #f0f8ff;

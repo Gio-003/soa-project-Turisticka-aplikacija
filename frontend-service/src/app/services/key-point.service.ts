@@ -1,6 +1,6 @@
 // src/app/services/key-point.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { ApiService } from './api.service';
 import { Observable } from 'rxjs';
 import { KeyPoint } from '../models/key-point.model';
 import { ConfigService } from './config.service';
@@ -9,25 +9,26 @@ import { ConfigService } from './config.service';
   providedIn: 'root'
 })
 
-
 export class KeyPointService {
 
   constructor(
-    private http: HttpClient,
+    private apiService: ApiService,
     private config: ConfigService
 ) { }
 
   addKeyPoint(tourId: string, keyPoint: Omit<KeyPoint, 'id' | 'tourId'>): Observable<KeyPoint> {
-    return this.http.post<KeyPoint>(`${this.config.tours_url}/${tourId}/keypoints`, keyPoint);
+    return this.apiService.post(`${this.config.tours_url}/${tourId}/keypoints`, keyPoint);
   }
 
   getKeyPointsForTour(tourId: string): Observable<KeyPoint[]> {
-    return this.http.get<KeyPoint[]>(`${this.config.tours_url}/${tourId}/keypoints`);
+    return this.apiService.get(`${this.config.tours_url}/${tourId}/keypoints`);
   }
+
   updateKeyPoint(tourId: string, keyPointId: string, keyPoint: Omit<KeyPoint, 'id' | 'tourId'>): Observable<KeyPoint> {
-    return this.http.put<KeyPoint>(`${this.config.tours_url}/${tourId}/keypoints/${keyPointId}`, keyPoint);
+    return this.apiService.put(`${this.config.tours_url}/${tourId}/keypoints/${keyPointId}`, keyPoint);
   }
+
   deleteKeyPoint(tourId: string, keyPointId: string): Observable<void> {
-    return this.http.delete<void>(`${this.config.tours_url}/${tourId}/keypoints/${keyPointId}`);
+    return this.apiService.delete(`${this.config.tours_url}/${tourId}/keypoints/${keyPointId}`);
   }
 }

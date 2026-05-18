@@ -29,16 +29,19 @@
     <div *ngIf="selectedTour">
       <h3>{{ selectedTour.name }}</h3>
 
-      <!-- KONTROLA MAPE - Povezana sa dinamičkim modom i novim drag eventom -->
       <app-map [mode]="mapMode" [tourPoints]="mapKeyPoints" (onPointSelected)="handlePointSelected($event)"
         (onPointMoved)="handlePointMoved($event)">
       </app-map>
 
+      <!-- TOUR REVIEWS -->
+      <ng-container *ngIf="selectedTour">
+        <app-tour-reviews [tourId]="selectedTour.id"></app-tour-reviews>
+      </ng-container>
+
       <!-- FORMA ZA IZMENU/DODAVANJE -->
       <div class="kp-form-container" *ngIf="isFormVisible">
         <h4>{{ isEditingKeyPoint ? 'Edit Key Point' : 'Add New Key Point' }}</h4>
-        <p class="coords-info">Coords: {{ currentPoint.lat | number:'1.4-4' }}, {{ currentPoint.lng | number:'1.4-4' }}
-        </p>
+        <p class="coords-info">Coords: {{ currentPoint.lat | number:'1.4-4' }}, {{ currentPoint.lng | number:'1.4-4' }}</p>
         <p *ngIf="mapMode === 'edit'" style="color: #3182ce; font-size: 0.85em; margin-bottom: 10px;">
           * Možete kliknuti na mapu ili prevući postojeći marker da promenite koordinate.
         </p>
@@ -53,10 +56,9 @@
         </div>
       </div>
 
-      <!-- LISTA KLJUČNIH TAČAKA SA AKCIJAMA -->
+      <!-- LISTA KLJUČNIH TAČAKA -->
       <div class="key-points-list">
         <h4>Key Points</h4>
-        <!-- Popravljeno dugme da ispravno okida pripremu za novu tačku -->
         <button class="btn-add-new" (click)="startAddNewKeyPoint()">+ Add New Key Point</button>
         <ul>
           <li *ngFor="let kp of mapKeyPoints">

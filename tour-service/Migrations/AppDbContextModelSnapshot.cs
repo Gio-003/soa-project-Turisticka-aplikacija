@@ -109,6 +109,46 @@ namespace tour_service.Migrations
                     b.ToTable("TourTags", "tour");
                 });
 
+            modelBuilder.Entity("tour_service.Models.Review", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Images")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("TourId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("TouristId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TouristUsername")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("VisitDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TourId");
+
+                    b.ToTable("Reviews", "tour");
+                });
+
             modelBuilder.Entity("tour_service.Models.KeyPoints", b =>
                 {
                     b.HasOne("tour_service.Models.Tour", "Tour")
@@ -124,6 +164,17 @@ namespace tour_service.Migrations
                 {
                     b.HasOne("tour_service.Models.Tour", "Tour")
                         .WithMany("Tags")
+                        .HasForeignKey("TourId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tour");
+                });
+
+            modelBuilder.Entity("tour_service.Models.Review", b =>
+                {
+                    b.HasOne("tour_service.Models.Tour", "Tour")
+                        .WithMany()
                         .HasForeignKey("TourId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

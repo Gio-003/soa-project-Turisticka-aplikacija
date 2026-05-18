@@ -12,45 +12,53 @@ import (
 func main() {
 	muxRouter := mux.NewRouter()
 
-	// CORS middleware
+	// CORS middleware na svim rutama
 	muxRouter.Use(middleware.CORSMiddleware)
 
-	// Health check (no auth needed)
-	muxRouter.HandleFunc("/health", healthCheck).Methods("GET")
+	// Health check
+	muxRouter.HandleFunc("/health", healthCheck).Methods("GET", "OPTIONS")
 
-	// Auth routes (no JWT required)
-	muxRouter.HandleFunc("/api/auth/login", router.ProxyAuth).Methods("POST")
-	muxRouter.HandleFunc("/api/auth/signup", router.ProxyAuth).Methods("POST")
+	// Auth rute - BEZ JWT-a
+	muxRouter.HandleFunc("/api/auth/login", router.ProxyAuth).Methods("POST", "OPTIONS")
+	muxRouter.HandleFunc("/api/auth/signup", router.ProxyAuth).Methods("POST", "OPTIONS")
 
-	// Protected routes (JWT required)
-	protectedRouter := muxRouter.PathPrefix("/api").Subrouter()
-	protectedRouter.Use(middleware.JWTMiddleware)
+	// Blog rute - SA JWT-om
+	muxRouter.Handle("/api/blogs", middleware.JWTMiddlewareFunc(router.ProxyBlog)).Methods("POST", "GET", "OPTIONS")
+	muxRouter.Handle("/api/blogs/{id}", middleware.JWTMiddlewareFunc(router.ProxyBlog)).Methods("GET", "OPTIONS")
+	muxRouter.Handle("/api/blogs/{blogId}/likes", middleware.JWTMiddlewareFunc(router.ProxyBlog)).Methods("POST", "DELETE", "OPTIONS")
+	muxRouter.Handle("/api/blogs/{blogId}/comments", middleware.JWTMiddlewareFunc(router.ProxyBlog)).Methods("GET", "POST", "OPTIONS")
+	muxRouter.Handle("/api/comments", middleware.JWTMiddlewareFunc(router.ProxyBlog)).Methods("POST", "GET", "OPTIONS")
+	muxRouter.Handle("/api/comments/{id}", middleware.JWTMiddlewareFunc(router.ProxyBlog)).Methods("PUT", "OPTIONS")
 
-	// Blog routes
-	protectedRouter.HandleFunc("/blogs", router.ProxyBlog).Methods("POST", "GET")
-	protectedRouter.HandleFunc("/blogs/{id}", router.ProxyBlog).Methods("GET")
-	protectedRouter.HandleFunc("/blogs/{blogId}/likes", router.ProxyBlog).Methods("POST", "DELETE")
-	protectedRouter.HandleFunc("/blogs/{blogId}/comments", router.ProxyBlog).Methods("GET")
-	protectedRouter.HandleFunc("/comments", router.ProxyBlog).Methods("POST", "GET")
-	protectedRouter.HandleFunc("/comments/{id}", router.ProxyBlog).Methods("PUT")
+	// Tour rute - SA JWT-om
+	muxRouter.Handle("/api/tours/all", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("GET", "OPTIONS")
+	muxRouter.Handle("/api/tours/my/{authorId}", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("GET", "OPTIONS")
+	muxRouter.Handle("/api/tours", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("POST", "GET", "OPTIONS")
+	muxRouter.Handle("/api/tours/{id}", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("GET", "OPTIONS")
+	muxRouter.Handle("/api/tours/{tourId}/keypoints", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("GET", "POST", "OPTIONS")
+	muxRouter.Handle("/api/tours/{tourId}/keypoints/{id}", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("PUT", "DELETE", "OPTIONS")
+	muxRouter.Handle("/api/tours/{tourId}/reviews", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("GET", "POST", "OPTIONS")
 
-	// User/Profile routes
-	protectedRouter.HandleFunc("/getMyInfo", router.ProxyAuth).Methods("GET")
-	protectedRouter.HandleFunc("/me", router.ProxyAuth).Methods("GET", "PUT")
-	protectedRouter.HandleFunc("/updateMyInfo", router.ProxyAuth).Methods("PUT")
+	// Follower rute - SA JWT-om
+	muxRouter.Handle("/api/followers/{followerId}/follow/{followedId}", middleware.JWTMiddlewareFunc(router.ProxyFollower)).Methods("POST", "DELETE", "OPTIONS")
+	muxRouter.Handle("/api/followers/{followerId}/following", middleware.JWTMiddlewareFunc(router.ProxyFollower)).Methods("GET", "OPTIONS")
+	muxRouter.Handle("/api/followers/{followerId}/followers", middleware.JWTMiddlewareFunc(router.ProxyFollower)).Methods("GET", "OPTIONS")
+	muxRouter.Handle("/api/followers/{followerId}/is-following/{followedId}", middleware.JWTMiddlewareFunc(router.ProxyFollower)).Methods("GET", "OPTIONS")
+	muxRouter.Handle("/api/followers/{userId}/recommendations", middleware.JWTMiddlewareFunc(router.ProxyFollower)).Methods("GET", "OPTIONS")
+	muxRouter.Handle("/api/followers/{userId}/can-read/{authorId}", middleware.JWTMiddlewareFunc(router.ProxyFollower)).Methods("GET", "OPTIONS")
+	muxRouter.Handle("/api/followers/{userId}/can-comment/{authorId}", middleware.JWTMiddlewareFunc(router.ProxyFollower)).Methods("GET", "OPTIONS")
 
-	// Admin routes
-	adminRouter := protectedRouter.PathPrefix("/admin").Subrouter()
-	adminRouter.Use(middleware.AdminMiddleware)
-	adminRouter.HandleFunc("/users", router.ProxyAuth).Methods("GET")
-	adminRouter.HandleFunc("/users/{id}/block", router.ProxyAuth).Methods("PUT")
+	// User/Profile rute - SA JWT-om
+	muxRouter.Handle("/api/getMyInfo", middleware.JWTMiddlewareFunc(router.ProxyAuth)).Methods("GET", "OPTIONS")
+	muxRouter.Handle("/api/me", middleware.JWTMiddlewareFunc(router.ProxyAuth)).Methods("GET", "PUT", "OPTIONS")
+	muxRouter.Handle("/api/updateMyInfo", middleware.JWTMiddlewareFunc(router.ProxyAuth)).Methods("PUT", "OPTIONS")
+
+	// Admin rute - SA JWT-om + Admin provjerom
+	muxRouter.Handle("/api/admin/users", middleware.JWTMiddlewareFunc(middleware.AdminMiddlewareFunc(router.ProxyAuth))).Methods("GET", "OPTIONS")
+	muxRouter.Handle("/api/admin/users/{id}/block", middleware.JWTMiddlewareFunc(middleware.AdminMiddlewareFunc(router.ProxyAuth))).Methods("PUT", "OPTIONS")
 
 	port := ":8000"
 	log.Println("🚀 API Gateway starting on port" + port)
-	log.Println("Routes configured:")
-	log.Println("  - Blog Service: /api/blogs, /api/comments")
-	log.Println("  - Stakeholders Service: /api/auth, /api/users, /api/me")
-	log.Println("  - Health check: /health")
 
 	if err := http.ListenAndServe(port, muxRouter); err != nil {
 		log.Fatal("Failed to start gateway: ", err)

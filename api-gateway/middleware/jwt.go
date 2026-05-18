@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"api-gateway/config"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -9,8 +10,9 @@ import (
 )
 
 type CustomClaims struct {
-	UserID string `json:"sub"`
-	Role   string `json:"role"`
+	UserID string  `json:"sub"`
+	UserId float64 `json:"userId"`
+	Role   string  `json:"role"`
 	jwt.RegisteredClaims
 }
 
@@ -44,10 +46,26 @@ func JWTMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		// Add user info to request context for admin middleware
-		r.Header.Set("X-User-ID", claims.UserID)
+		r.Header.Set("X-User-ID", fmt.Sprintf("%d", int(claims.UserId)))
 		r.Header.Set("X-User-Role", claims.Role)
+		r.Header.Set("X-Username", claims.UserID)
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+func JWTMiddlewareFunc(next http.HandlerFunc) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		JWTMiddleware(http.HandlerFunc(next)).ServeHTTP(w, r)
+	})
+}
+
+func AdminMiddlewareFunc(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		AdminMiddleware(http.HandlerFunc(next)).ServeHTTP(w, r)
+	}
 }

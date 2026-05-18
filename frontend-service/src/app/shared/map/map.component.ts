@@ -134,18 +134,27 @@ export class MapComponent implements AfterViewInit, OnChanges {
     }
   }
 
-  setRoute(points: KeyPoint[]): void {
-    if (this.routeControl) {
+setRoute(points: KeyPoint[]): void {
+  if (this.routeControl) {
+    try {
       this.map.removeControl(this.routeControl);
-    }
-    const waypoints = points.map(p => L.latLng(p.lat, p.lng));
-    this.routeControl = L.Routing.control({
+    } catch (e) {}
+    this.routeControl = null;
+  }
+  
+  const waypoints = points.map(p => L.latLng(p.lat, p.lng));
+  
+  try {
+    this.routeControl = (L.Routing as any).control({
       waypoints: waypoints,
-      addWaypoints: false, 
+      addWaypoints: false,
       draggableWaypoints: false,
       show: false
-    }as any).addTo(this.map);
+    }).addTo(this.map);
+  } catch (e) {
+    console.warn('Routing control error:', e);
   }
+}
 
   private clearMarkers(): void {
     this.markers.forEach(m => this.map.removeLayer(m));

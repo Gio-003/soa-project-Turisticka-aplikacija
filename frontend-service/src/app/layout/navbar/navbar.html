@@ -3,10 +3,11 @@
         TravelApp
     </div>
     <div class="navbar-right">
+        <button class="btn logout-btn" *ngIf="hasSignedIn()" (click)="goToBlogs()">Blogs</button>
+        <button class="btn logout-btn" *ngIf="hasSignedIn()" (click)="goToTourPanel()">Tours</button>
         <button class="btn login-btn" *ngIf="!hasSignedIn()" (click)="goToLogin()">Log in</button>
         <button class="btn signup-btn" *ngIf="!hasSignedIn()" (click)="goToSignup()">Sign up</button>
         <button class="btn logout-btn" *ngIf="hasSignedIn()" (click)="logout()">Log out</button>
-        <button class="btn logout-btn" *ngIf="hasSignedIn()" (click)="goToTourPanel()">Tours</button>
         <div *ngIf="hasSignedIn()">Hello, {{userName()}}</div>
     </div>
 </nav>
