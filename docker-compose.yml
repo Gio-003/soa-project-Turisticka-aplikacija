@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
 
   postgres:
@@ -125,6 +123,26 @@ services:
     container_name: frontend_service
     ports:
       - "4200:80"
+    networks:
+      - tourapp-network
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+    container_name: api_gateway
+    ports:
+      - "8000:8000"
+    environment:
+      BLOG_SERVICE_URL: http://blog-service:8080
+      STAKEHOLDERS_SERVICE_URL: http://stakeholders-service:8080
+      TOUR_SERVICE_URL: http://tour-service:8080
+      FOLLOWER_SERVICE_URL: http://follower-service:8083
+      JWT_SECRET: somesecret-key-for-jwt-token-has-to-be-512-bits-long-1234567890123456789
+    depends_on:
+      - blog-service
+      - stakeholders-service
+      - tour-service
+      - follower-service
     networks:
       - tourapp-network
 

@@ -18,6 +18,16 @@ func ProxyAuth(w http.ResponseWriter, r *http.Request) {
 	forwardRequest(w, r, config.ServiceURLs["stakeholders"])
 }
 
+// ProxyTour routes requests to the tour service
+func ProxyTour(w http.ResponseWriter, r *http.Request) {
+	forwardRequest(w, r, config.ServiceURLs["tour"])
+}
+
+// ProxyFollower routes requests to the follower service
+func ProxyFollower(w http.ResponseWriter, r *http.Request) {
+	forwardRequest(w, r, config.ServiceURLs["follower"])
+}
+
 // forwardRequest forwards the request to the target service
 func forwardRequest(w http.ResponseWriter, r *http.Request, targetURL string) {
 	// Build the target URL

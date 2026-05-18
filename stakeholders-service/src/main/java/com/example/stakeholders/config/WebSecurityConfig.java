@@ -105,9 +105,7 @@ public class WebSecurityConfig {
                 .anyRequest().authenticated()
         );
 
-        // za development svrhe ukljuci konfiguraciju za CORS iz WebConfig klase
-        http.cors(cors -> cors.configure(http));
-
+        http.cors(cors -> cors.disable());
         // zbog jednostavnosti primera ne koristimo Anti-CSRF token (https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html)
         http.csrf(csrf -> csrf.disable());
 
