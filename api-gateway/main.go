@@ -37,6 +37,7 @@ func main() {
 	muxRouter.Handle("/api/tours/{id}", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("GET", "OPTIONS")
 	muxRouter.Handle("/api/tours/{tourId}/keypoints", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("GET", "POST", "OPTIONS")
 	muxRouter.Handle("/api/tours/{tourId}/keypoints/{id}", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("PUT", "DELETE", "OPTIONS")
+	muxRouter.Handle("/api/tours/{tourId}/reviews", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("GET", "POST", "OPTIONS")
 
 	// Follower rute - SA JWT-om
 	muxRouter.Handle("/api/followers/{followerId}/follow/{followedId}", middleware.JWTMiddlewareFunc(router.ProxyFollower)).Methods("POST", "DELETE", "OPTIONS")

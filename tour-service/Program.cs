@@ -20,19 +20,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<TourRepository>();
 builder.Services.AddScoped<KeyPointRepository>();
+builder.Services.AddScoped<ReviewRepository>();
 builder.Services.AddScoped<KeyPointService>();
 builder.Services.AddScoped<TourService>();
-
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAngular", policy =>
-    {
-        policy
-            .WithOrigins("http://localhost:4200")
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
-});
+builder.Services.AddScoped<ReviewService>();
 
 var app = builder.Build();
 
@@ -41,8 +32,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.UseCors("AllowAngular");
 
 app.UseAuthentication();
 app.UseAuthorization();
