@@ -1,0 +1,89 @@
+<div class="my-tours-container">
+
+  <!-- LEFT PANEL -->
+  <div class="tours-list-section">
+    <h2>My Tours</h2>
+    <button class="btn tour-btn" *ngIf="hasSignedIn() && userService.currentUser?.role === 'GUIDE'"
+      (click)="goToCreateTour()">
+      Create tour
+    </button>
+
+    <button class="btn tour-btn" *ngIf="hasSignedIn() && userService.currentUser?.role === 'GUIDE'"
+      (click)="goToAllTours()">
+      All tours
+    </button>
+    <div *ngIf="tours.length === 0" class="empty">
+      No tours found
+    </div>
+
+    <ul class="tours-list">
+      <li *ngFor="let tour of tours"
+          (click)="selectTour(tour)"
+          [class.active]="selectedTour?.id === tour.id">
+
+        <h3>{{ tour.name }}</h3>
+
+        <small>
+          {{ tour.difficulty }} • {{ tour.price }} € • {{ tour.status }}
+        </small>
+
+      </li>
+    </ul>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="tour-details-section">
+
+    <div *ngIf="!selectedTour" class="placeholder">
+      Select a tour to see details
+    </div>
+
+    <div *ngIf="selectedTour">
+
+      <!-- BASIC INFO -->
+      <h2>{{ selectedTour.name }}</h2>
+
+      <p>{{ selectedTour.description }}</p>
+
+      <p><b>Difficulty:</b> {{ selectedTour.difficulty }}</p>
+      <p><b>Price:</b> {{ selectedTour.price }} €</p>
+      <p><b>Status:</b> {{ selectedTour.status }}</p>
+
+      <!-- TAGS -->
+      <p>
+        <b>Tags:</b>
+        <span *ngFor="let tag of selectedTour.tags; let last = last">
+          {{ tag }}<span *ngIf="!last">, </span>
+        </span>
+      </p>
+
+      <hr />
+
+      <!-- MAP -->
+      <app-map
+        [mode]="'view'"
+        [tourPoints]="mapKeyPoints">
+      </app-map>
+
+      <!-- KEY POINTS -->
+      <div class="key-points-list">
+
+        <h3>Key Points</h3>
+
+        <ul>
+          <li *ngFor="let kp of mapKeyPoints">
+
+            <div class="kp-info">
+              <strong>{{ kp.name }}</strong>
+              <p>{{ kp.description }}</p>
+            </div>
+
+          </li>
+        </ul>
+
+      </div>
+
+    </div>
+  </div>
+
+</div>

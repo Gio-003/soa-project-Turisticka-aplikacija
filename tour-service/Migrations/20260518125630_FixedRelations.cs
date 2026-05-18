@@ -25,7 +25,7 @@ namespace tour_service.Migrations
                     Difficulty = table.Column<string>(type: "text", nullable: false),
                     Status = table.Column<int>(type: "integer", nullable: false),
                     Price = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
-                    AuthorId = table.Column<Guid>(type: "uuid", nullable: false)
+                    AuthorId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {

@@ -12,7 +12,7 @@ using tour_service.Data;
 namespace tour_service.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260517200439_FixedRelations")]
+    [Migration("20260518125630_FixedRelations")]
     partial class FixedRelations
     {
         /// <inheritdoc />
@@ -66,8 +66,8 @@ namespace tour_service.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("AuthorId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("AuthorId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Description")
                         .IsRequired()

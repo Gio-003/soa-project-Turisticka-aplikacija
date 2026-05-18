@@ -119,6 +119,15 @@ services:
     networks:
       - tourapp-network
 
+  frontend-service:
+    build:
+      context: ./frontend-service
+    container_name: frontend_service
+    ports:
+      - "4200:80"
+    networks:
+      - tourapp-network
+
 volumes:
   postgres_data:
   neo4j_data:

@@ -43,7 +43,7 @@ export class Navbar {
     this.authService.logout();
   }
 
-  goToGuidePanel(): void {
-    this.router.navigate(['/tours/create']);
+  goToTourPanel(): void {
+    this.router.navigate(['/tours/all']);
   }
 }

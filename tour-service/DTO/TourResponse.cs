@@ -11,9 +11,7 @@ namespace tour_service.DTO
 
         public decimal Price { get; set; }
         public TourStatus Status { get; set; }
-
-        public Guid AuthorId { get; set; }
-
         public List<string> Tags { get; set; }
+        public List<KeyPointResponse> KeyPoints { get; set; }
     }
 }

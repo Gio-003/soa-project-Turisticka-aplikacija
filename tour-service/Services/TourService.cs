@@ -19,7 +19,7 @@ namespace tour_service.Services
         }
 
         // CREATE TOUR
-        public Tour CreateTour(CreateTourRequest request, Guid authorId)
+        public Tour CreateTour(CreateTourRequest request)
         {
             var tour = new Tour
             {
@@ -28,7 +28,7 @@ namespace tour_service.Services
                 Description = request.Description,
                 Difficulty = request.Difficulty,
 
-                AuthorId = authorId,
+                AuthorId = request.AuthorId,
 
                 Status = TourStatus.Draft,
                 Price = 0,
@@ -60,7 +60,7 @@ namespace tour_service.Services
         }
 
         // GET TOURS BY AUTHOR (RETURN DTO, NOT ENTITY)
-        public List<TourResponse> GetToursByAuthor(Guid authorId)
+        public List<TourResponse> GetToursByAuthor(int authorId)
         {
             return _context.Tours
                 .Include(t => t.Tags)
@@ -74,8 +74,18 @@ namespace tour_service.Services
                     Difficulty = t.Difficulty,
                     Price = t.Price,
                     Status = t.Status,
-                    AuthorId = t.AuthorId,
-                    Tags = t.Tags.Select(tag => tag.Name).ToList()
+
+                    Tags = t.Tags.Select(tag => tag.Name).ToList(),
+
+                    KeyPoints = t.KeyPoints.Select(kp => new KeyPointResponse
+                    {
+                        Id = kp.Id,
+                        Name = kp.Name,
+                        Description = kp.Description,
+                        ImageUrl = kp.ImageUrl,
+                        Latitude = kp.Latitude,
+                        Longitude = kp.Longitude
+                    }).ToList()
                 })
                 .ToList();
         }

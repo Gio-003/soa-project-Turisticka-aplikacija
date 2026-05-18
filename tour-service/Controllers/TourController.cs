@@ -19,32 +19,18 @@ namespace MyApp.Controllers
         [HttpPost]
         public IActionResult CreateTour([FromBody] CreateTourRequest request)
         {
-            /*var userIdClaim = User.FindFirst("id")?.Value;
-
-            if (!Guid.TryParse(userIdClaim, out Guid authorId))
-            {
-                return Unauthorized("Invalid or missing user id in token.");
-            }*/
-            Guid id = Guid.NewGuid();
-            var tourResponse = _tourService.CreateTour(request, id);
+            var tourResponse = _tourService.CreateTour(request);
 
             return Ok(tourResponse);
         }
 
-        [HttpGet("my")]
-        public IActionResult GetMyTours()
+        [HttpGet("my/{authorId}")]
+        public IActionResult GetMyTours(int authorId)
         {
-            var userIdClaim = User.FindFirst("id")?.Value;
-
-            if (!Guid.TryParse(userIdClaim, out Guid authorId))
-            {
-                return Unauthorized("Invalid or missing user id in token.");
-            }
-
             var tours = _tourService.GetToursByAuthor(authorId);
-
             return Ok(tours);
         }
+
         [HttpGet("all")]
         public IActionResult GetAllTours()
         {

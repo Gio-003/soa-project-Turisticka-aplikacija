@@ -7,6 +7,13 @@
   height: calc(100vh - 60px); /* Visina prozora minus visina navbara */
 }
 
+.tour-btn {
+  background-color: #4db2c9;
+  color: white;
+  font-weight: bold;
+  margin: 5px;
+}
+
 /* --- Leva kolona: Lista tura --- */
 .tours-list-section {
   width: 350px;

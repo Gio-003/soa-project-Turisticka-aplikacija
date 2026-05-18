@@ -9,6 +9,8 @@
         public List<string> Tags { get; set; }
 
         public List<KeyPointFromFrontDTO> KeyPoints { get; set; } = new();
+
+        public int AuthorId { get; set; }
     }
 
     public class KeyPointFromFrontDTO

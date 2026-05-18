@@ -3,6 +3,7 @@ package com.example.stakeholders.dto;
 import com.example.stakeholders.model.RoleType;
 
 public class UserInfo {
+    private Long Id;
     private String firstName;
     private String lastName;
     private String profilePicture;
@@ -56,5 +57,13 @@ public class UserInfo {
 
     public void setRole(RoleType role) {
         this.role = role;
+    }
+
+    public Long getId() {
+        return Id;
+    }
+
+    public void setId(Long id) {
+        Id = id;
     }
 }
