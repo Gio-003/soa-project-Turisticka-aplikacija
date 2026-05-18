@@ -18,6 +18,7 @@ builder.Services.AddControllers()
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 builder.Services.AddScoped<TourRepository>();
 builder.Services.AddScoped<KeyPointRepository>();
 builder.Services.AddScoped<ReviewRepository>();
