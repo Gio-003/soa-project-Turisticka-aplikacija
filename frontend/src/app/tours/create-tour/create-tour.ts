@@ -4,13 +4,15 @@ import { ReactiveFormsModule, FormsModule, FormBuilder, FormGroup, Validators } 
 import { SharedModule } from '../../shared/shared.module';
 import { KeyPoint } from '../../shared/map/map.component';
 import { TourService } from '../../services/tour.service';
+import { UserService } from '../../services/user.service';
 
 export interface CreateTourRequest {
   name: string;
   description: string;
   difficulty: string;
   tags: string[];
-  keyPoints: KeyPoint[]; 
+  keyPoints: KeyPoint[];
+  authorId: number; 
 }
 
 @Component({
@@ -31,7 +33,8 @@ export class CreateTour implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private tourService: TourService
+    private tourService: TourService,
+    public userService: UserService
   ) {}
 
   ngOnInit(): void {
@@ -86,7 +89,8 @@ export class CreateTour implements OnInit {
       tags: formValue.tags
         ? formValue.tags.split(',').map((t: string) => t.trim())
         : [],
-      keyPoints: this.keyPoints // Sakupljene tačke sa mape ubacujemo u zahtev
+      keyPoints: this.keyPoints, // Sakupljene tačke sa mape ubacujemo u zahtev
+      authorId: this.userService.currentUser.Id
     };
 
     // Slanje na backend preko servisa

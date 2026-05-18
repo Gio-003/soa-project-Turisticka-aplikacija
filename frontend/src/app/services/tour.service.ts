@@ -17,7 +17,7 @@ export class TourService {
   constructor(
     private apiService: ApiService,
     private config: ConfigService
-  ) {}
+  ) { }
 
   createTour(request: CreateTourRequest) {
     return this.apiService.post(
@@ -26,14 +26,14 @@ export class TourService {
     );
   }
 
-  getMyTours() {
+  getMyTours(authorId: number) {
     return this.apiService.get(
-      this.config.tours_url + '/my'
+      `${this.config.tours_url}/my/${authorId}`
     );
   }
   getAllTours() {
     return this.apiService.get(
-      this.config.tours_url+'/all'
+      this.config.tours_url + '/all'
     );
   }
 }

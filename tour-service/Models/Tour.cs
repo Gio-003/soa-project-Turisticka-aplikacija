@@ -17,7 +17,7 @@ namespace tour_service.Models
 
         public decimal Price { get; set; }
 
-        public Guid AuthorId { get; set; }
+        public int AuthorId { get; set; }
 
         public List<KeyPoints> KeyPoints { get; set; } = new();
     }

@@ -13,7 +13,6 @@ namespace tour_service.Repositories
             _context = context;
         }
 
-        // CREATE
         public Tour Create(Tour tour)
         {
             _context.Tours.Add(tour);
@@ -21,7 +20,6 @@ namespace tour_service.Repositories
             return tour;
         }
 
-        // GET BY ID
         public Tour GetById(Guid id)
         {
             return _context.Tours
@@ -30,15 +28,12 @@ namespace tour_service.Repositories
                 .FirstOrDefault(t => t.Id == id);
         }
 
-        // UPDATE
         public Tour Update(Tour tour)
         {
             _context.Tours.Update(tour);
             _context.SaveChanges();
             return tour;
         }
-
-        // DELETE
         public Tour Delete(Guid id)
         {
             var tour = _context.Tours
@@ -55,7 +50,6 @@ namespace tour_service.Repositories
             return tour;
         }
 
-        // GET ALL
         public List<Tour> GetAll()
         {
             return _context.Tours
@@ -64,8 +58,7 @@ namespace tour_service.Repositories
                 .ToList();
         }
 
-        // GET BY AUTHOR
-        public List<Tour> GetByAuthorId(Guid authorId)
+        public List<Tour> GetByAuthorId(int authorId)
         {
             return _context.Tours
                 .Include(t => t.Tags)
@@ -74,7 +67,6 @@ namespace tour_service.Repositories
                 .ToList();
         }
 
-        // OPTIONAL: GET ONLY PUBLISHED
         public List<Tour> GetPublished()
         {
             return _context.Tours

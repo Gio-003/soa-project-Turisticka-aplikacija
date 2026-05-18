@@ -2,26 +2,20 @@
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-.manage-tours-container {
+/* --- GLAVNI LAYOUT --- */
+.my-tours-container {
   display: flex;
-  height: calc(100vh - 60px); /* Visina prozora minus visina navbara */
+  height: calc(100vh - 60px);
 }
 
-.tour-btn {
-  background-color: #4db2c9;
-  color: white;
-  font-weight: bold;
-  margin: 5px;
-}
-
-/* --- Leva kolona: Lista tura --- */
+/* --- LEVA KOLONA --- */
 .tours-list-section {
   width: 350px;
   border-right: 1px solid #e0e0e0;
   padding: 1.5rem;
   background-color: #f8f9fa;
   overflow-y: auto;
-  flex-shrink: 0; /* Sprečava smanjivanje leve kolone */
+  flex-shrink: 0;
 }
 
 .tours-list-section h2 {
@@ -29,6 +23,7 @@
   color: #333;
 }
 
+/* --- LISTA --- */
 .tours-list {
   list-style: none;
   padding: 0;
@@ -41,12 +36,15 @@
   cursor: pointer;
   transition: background-color 0.2s;
   margin-bottom: 0.5rem;
+  background: white;
+  border: 1px solid #eee;
 }
 
 .tours-list li:hover {
   background-color: #e9ecef;
 }
 
+/* 🔥 ACTIVE STATE (KLJUČNO – kao u drugom CSS-u) */
 .tours-list li.active {
   background-color: #007bff;
   color: white;
@@ -59,14 +57,15 @@
   opacity: 0.8;
 }
 
-/* --- Desna kolona: Detalji --- */
+/* --- DESNA KOLONA --- */
 .tour-details-section {
   flex: 1;
   padding: 2rem;
   overflow-y: auto;
-  position: relative; /* Postavljamo kao referentni kontejner */
+  position: relative;
 }
 
+/* placeholder */
 .placeholder {
   display: flex;
   justify-content: center;
@@ -76,77 +75,71 @@
   font-size: 1.2rem;
 }
 
-.tour-details-section h3 {
+/* naslov detalja */
+.tour-details-section h2 {
   margin-top: 0;
   font-size: 2rem;
   color: #333;
 }
 
+/* --- MAPA (ako koristiš) --- */
 app-map {
   display: block;
   height: 400px;
   width: 100%;
   border-radius: 8px;
-  margin-bottom: 1.5rem;
-  position: relative; /* Osiguravamo da je u stacking context-u */
-  z-index: 1;        /* Postavljamo ga na osnovni sloj */
+  margin: 1.5rem 0;
+  position: relative;
+  z-index: 1;
 }
 
-/* --- Forma za izmenu/dodavanje --- */
-.kp-form-container {
-  background-color: #f0f8ff;
-  padding: 1.5rem;
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
-  position: relative; /* Osiguravamo da je iznad mape */
-  z-index: 2;
-}
-
-.kp-form-container input, .kp-form-container textarea {
-  width: 100%;
-  padding: 0.7rem;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  margin-bottom: 0.8rem;
-  box-sizing: border-box;
-}
-
-.form-actions {
-  display: flex;
-  gap: 1rem;
-}
-
-/* --- Lista ključnih tačaka --- */
+/* --- KEY POINTS LIST --- */
 .key-points-list {
   margin-top: 2rem;
-  position: relative; /* Osiguravamo da je iznad mape */
+  position: relative;
   z-index: 2;
 }
-.key-points-list h4 {
+
+.key-points-list h3 {
   display: inline-block;
   margin-right: 1rem;
 }
+
 .key-points-list ul {
   list-style: none;
   padding: 0;
 }
+
 .key-points-list li {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
   border-bottom: 1px solid #eee;
-  background-color: #fff; /* Dodajemo pozadinu da bude sigurno neprozirno */
+  background-color: #fff;
 }
+
 .kp-info p {
   margin: 0;
   color: #666;
 }
-.kp-actions button {
-  margin-left: 0.5rem;
+
+/* --- EMPTY STATE --- */
+.empty {
+  color: #888;
+  padding: 1rem;
 }
 
-/* --- Dugmad --- */
+/* --- TAGS --- */
+.tour-details-section span {
+  background: #f1f1f1;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-right: 4px;
+  font-size: 12px;
+}
+
+/* --- BUTTONS (ako ih koristiš) --- */
 button {
   padding: 0.5rem 1rem;
   border: none;
@@ -154,18 +147,29 @@ button {
   cursor: pointer;
   font-weight: bold;
 }
+
 .btn-save, .btn-add-new {
   background-color: #28a745;
   color: white;
 }
+
 .btn-cancel {
   background-color: #6c757d;
   color: white;
 }
+
 .kp-actions button {
   background-color: #007bff;
   color: white;
 }
+
 .kp-actions button:last-child {
   background-color: #dc3545;
+}
+
+.tour-btn {
+  background-color: #4db2c9;
+  color: white;
+  font-weight: bold;
+  margin: 5px;
 }

@@ -76,6 +76,7 @@ public class UserServiceImpl implements UserService {
             throw new UsernameNotFoundException(String.format("No user found with username '%s'.", username));
         }
         UserInfo userInfo = new UserInfo();
+        userInfo.setId(user.getId());
         userInfo.setFirstName(user.getFirstName());
         userInfo.setLastName(user.getLastName());
         userInfo.setProfilePicture(user.getProfilePicture());

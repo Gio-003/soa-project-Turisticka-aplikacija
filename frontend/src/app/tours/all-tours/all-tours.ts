@@ -6,6 +6,8 @@ import { TourService } from '../../services/tour.service';
 import { KeyPointService } from '../../services/key-point.service';
 import { KeyPoint as ApiKeyPoint } from '../../models/key-point.model'; // Model sa backenda
 import { KeyPoint as MapKeyPoint } from '../../shared/map/map.component'; // Model za mapu
+import { UserService } from '../../services/user.service';
+import { Router } from '@angular/router';
 
 // Popravljen interfejs: Uklonjen neispravan 'extends ApiKeyPoint'
 export interface Tour {
@@ -40,11 +42,25 @@ export class AllToursComponent implements OnInit {
 
   constructor(
     private tourService: TourService,
-    private keyPointService: KeyPointService
+    private keyPointService: KeyPointService,
+    public userService: UserService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
     this.loadTours();
+  }
+
+  goToCreateTour(): void {
+    this.router.navigate(['/tours/create']);
+  }
+
+  goToMyTours(): void {
+    this.router.navigate(['/tours/my']);
+  }
+
+  hasSignedIn() {
+    return !!this.userService.currentUser;
   }
 
   loadTours(): void {
