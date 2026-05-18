@@ -109,6 +109,52 @@ namespace tour_service.Migrations
                     b.ToTable("TourTags", "tour");
                 });
 
+            modelBuilder.Entity("tour_service.Models.Review", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Images")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValue("[]")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("ReviewDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ReviewerName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ReviewerProfilePicture")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("ReviewerUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TourId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("VisitDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TourId");
+
+                    b.HasIndex("ReviewerUserId");
+
+                    b.ToTable("Reviews", "tour");
+                });
+
             modelBuilder.Entity("tour_service.Models.KeyPoints", b =>
                 {
                     b.HasOne("tour_service.Models.Tour", "Tour")
@@ -136,6 +182,19 @@ namespace tour_service.Migrations
                     b.Navigation("KeyPoints");
 
                     b.Navigation("Tags");
+
+                    b.Navigation("Reviews");
+                });
+
+            modelBuilder.Entity("tour_service.Models.Review", b =>
+                {
+                    b.HasOne("tour_service.Models.Tour", "Tour")
+                        .WithMany("Reviews")
+                        .HasForeignKey("TourId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tour");
                 });
 #pragma warning restore 612, 618
         }

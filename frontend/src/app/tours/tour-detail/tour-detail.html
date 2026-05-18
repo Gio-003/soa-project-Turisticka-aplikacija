@@ -1,0 +1,47 @@
+<div class="tour-detail-container">
+  <!-- Učitavanje -->
+  <div *ngIf="loading" class="loading">
+    Učitavanje ture...
+  </div>
+
+  <!-- Detalji ture -->
+  <div *ngIf="!loading && tour" class="tour-detail">
+    <div class="tour-header">
+      <h1>{{ tour.name }}</h1>
+      <div class="tour-meta">
+        <span class="difficulty" [style.background-color]="getDifficultyColor(tour.difficulty)">
+          {{ tour.difficulty }}
+        </span>
+        <span class="price">{{ tour.price | currency }}</span>
+      </div>
+    </div>
+
+    <p class="description">{{ tour.description }}</p>
+
+    <!-- Tagovi -->
+    <div *ngIf="tour.tags && tour.tags.length > 0" class="tags">
+      <span class="tag" *ngFor="let tag of tour.tags">{{ tag }}</span>
+    </div>
+
+    <!-- Dugme za pisanje recenzije -->
+    <button class="btn btn-primary" (click)="showReviewForm = !showReviewForm">
+      {{ showReviewForm ? 'Zatvori formu' : 'Napravи recenziju' }}
+    </button>
+
+    <!-- Forma za recenziju -->
+    <div *ngIf="showReviewForm" class="review-form-section">
+      <app-create-review></app-create-review>
+    </div>
+
+    <!-- Lista recenzija -->
+    <div class="reviews-section">
+      <h2>Recenzije</h2>
+      <app-review-list [tourId]="tourId"></app-review-list>
+    </div>
+  </div>
+
+  <!-- Greška -->
+  <div *ngIf="!loading && !tour" class="error">
+    <p>Tura nije pronađena.</p>
+  </div>
+</div>

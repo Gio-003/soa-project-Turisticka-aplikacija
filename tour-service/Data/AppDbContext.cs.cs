@@ -14,6 +14,7 @@ namespace tour_service.Data
         public DbSet<KeyPoints> KeyPoints { get; set; }
         public DbSet<Tour> Tours { get; set; }
         public DbSet<TourTag> TourTags { get; set; }
+        public DbSet<Review> Reviews { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -79,6 +80,30 @@ namespace tour_service.Data
                 entity.Property(t => t.Name).IsRequired();
 
                 entity.Property(t => t.TourId).IsRequired();
+            });
+
+            // =========================
+            // REVIEW
+            // =========================
+            modelBuilder.Entity<Review>(entity =>
+            {
+                entity.HasKey(r => r.Id);
+
+                entity.Property(r => r.TourId).IsRequired();
+                entity.Property(r => r.ReviewerUserId).IsRequired();
+                entity.Property(r => r.Rating).IsRequired();
+                entity.Property(r => r.Comment).IsRequired();
+                entity.Property(r => r.VisitDate).IsRequired();
+                entity.Property(r => r.ReviewDate).IsRequired();
+                entity.Property(r => r.Images).HasDefaultValue("[]");
+                entity.Property(r => r.ReviewerName);
+                entity.Property(r => r.ReviewerProfilePicture);
+
+                // RELATION: Review -> Tour
+                entity.HasOne(r => r.Tour)
+                      .WithMany(t => t.Reviews)
+                      .HasForeignKey(r => r.TourId)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

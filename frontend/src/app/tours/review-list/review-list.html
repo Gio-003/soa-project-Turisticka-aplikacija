@@ -1,0 +1,58 @@
+<div class="reviews-container">
+  <!-- Statistika -->
+  <div *ngIf="stats" class="review-stats">
+    <div class="stats-content">
+      <div class="rating-display">
+        <span class="rating-number">{{ stats.averageRating.toFixed(1) }}</span>
+        <span class="rating-stars">{{ getRatingStars(Math.round(stats.averageRating)) }}</span>
+      </div>
+      <p class="review-count">{{ stats.count }} recenzija</p>
+    </div>
+  </div>
+
+  <!-- Lista recenzija -->
+  <div *ngIf="loading" class="loading">
+    Učitavanje recenzija...
+  </div>
+
+  <div *ngIf="!loading && reviews.length === 0" class="no-reviews">
+    <p>Nema recenzija za ovu turu. Budite prvi koji će je oceniti!</p>
+  </div>
+
+  <div class="reviews-list">
+    <div class="review-item" *ngFor="let review of reviews">
+      <!-- Header recenzije -->
+      <div class="review-header">
+        <div class="reviewer-info">
+          <img 
+            *ngIf="review.reviewerProfilePicture" 
+            [src]="review.reviewerProfilePicture" 
+            alt="Avatar"
+            class="avatar">
+          <div class="reviewer-details">
+            <h4>{{ review.reviewerName }}</h4>
+            <p class="review-date">{{ formatDate(review.reviewDate) }}</p>
+          </div>
+        </div>
+        <div class="review-rating">
+          {{ getRatingStars(review.rating) }}
+        </div>
+      </div>
+
+      <!-- Komentar -->
+      <div class="review-body">
+        <p class="comment">{{ review.comment }}</p>
+        <small class="visit-info">Posetio je: {{ formatDate(review.visitDate) }}</small>
+      </div>
+
+      <!-- Slike -->
+      <div *ngIf="review.images && review.images.length > 0" class="review-images">
+        <img 
+          *ngFor="let image of review.images" 
+          [src]="image" 
+          alt="Review image"
+          class="review-image">
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,83 @@
+<div class="review-container">
+  <h3>Ostavi Recenziju</h3>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="review-form">
+    <!-- Notifikacija -->
+    <div *ngIf="notification" [ngClass]="'alert alert-' + notification.msgType">
+      {{ notification.msgBody }}
+    </div>
+
+    <!-- Ocena -->
+    <div class="form-group">
+      <label for="rating">Ocena (1-5 zvezdica) *</label>
+      <select id="rating" formControlName="rating" class="form-control">
+        <option value="">Izaberite ocenu</option>
+        <option value="1">⭐ - Loše</option>
+        <option value="2">⭐⭐ - Zadovoljavajuće</option>
+        <option value="3">⭐⭐⭐ - Dobro</option>
+        <option value="4">⭐⭐⭐⭐ - Odličko</option>
+        <option value="5">⭐⭐⭐⭐⭐ - Izvanredno</option>
+      </select>
+      <small class="error" *ngIf="form.get('rating')?.invalid && form.get('rating')?.touched">
+        Ocena je obavezna
+      </small>
+    </div>
+
+    <!-- Komentar -->
+    <div class="form-group">
+      <label for="comment">Komentar *</label>
+      <textarea 
+        id="comment" 
+        formControlName="comment" 
+        class="form-control"
+        rows="5"
+        placeholder="Opišite vašu iskustvo...">
+      </textarea>
+      <small class="error" *ngIf="form.get('comment')?.invalid && form.get('comment')?.touched">
+        Komentar mora biti najmanje 10 karaktera
+      </small>
+    </div>
+
+    <!-- Datum posete -->
+    <div class="form-group">
+      <label for="visitDate">Datum posete ture *</label>
+      <input 
+        type="date" 
+        id="visitDate" 
+        formControlName="visitDate" 
+        class="form-control">
+      <small class="error" *ngIf="form.get('visitDate')?.invalid && form.get('visitDate')?.touched">
+        Datum posete je obavezan
+      </small>
+    </div>
+
+    <!-- Upload slika -->
+    <div class="form-group">
+      <label for="images">Dodaj slike (opciono)</label>
+      <input 
+        type="file" 
+        id="images" 
+        multiple 
+        accept="image/*"
+        (change)="onImageSelected($event)"
+        class="form-control">
+      <small>Možete dodati više slika</small>
+    </div>
+
+    <!-- Prikaz slika -->
+    <div class="image-previews" *ngIf="imagePreviews.length > 0">
+      <div class="preview-item" *ngFor="let preview of imagePreviews; let i = index">
+        <img [src]="preview" alt="Preview">
+        <button type="button" (click)="removeImage(i)" class="btn-remove">✕</button>
+      </div>
+    </div>
+
+    <!-- Submit dugme -->
+    <button 
+      type="submit" 
+      class="btn btn-primary"
+      [disabled]="submitted">
+      {{ submitted ? 'Slanje...' : 'Objavi Recenziju' }}
+    </button>
+  </form>
+</div>

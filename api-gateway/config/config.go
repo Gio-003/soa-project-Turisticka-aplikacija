@@ -6,8 +6,10 @@ import (
 
 // ServiceURLs holds the backend service URLs
 var ServiceURLs = map[string]string{
-	"blog":        getEnv("BLOG_SERVICE_URL", "http://blog:8080"),
-	"stakeholders": getEnv("STAKEHOLDERS_SERVICE_URL", "http://stakeholders:8080"),
+	"blog":         getEnv("BLOG_SERVICE_URL", "http://blog-service:8080"),
+	"stakeholders": getEnv("STAKEHOLDERS_SERVICE_URL", "http://stakeholders-service:8080"),
+	"tour":         getEnv("TOUR_SERVICE_URL", "http://tour-service:8080"),
+	"follower":     getEnv("FOLLOWER_SERVICE_URL", "http://follower-service:8083"),
 }
 
 // JWT Configuration

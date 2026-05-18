@@ -26,6 +26,12 @@ export class TourService {
     );
   }
 
+  getTourById(tourId: string) {
+    return this.apiService.get(
+      this.config.tours_url + '/' + tourId
+    );
+  }
+
   getMyTours() {
     return this.apiService.get(
       this.config.tours_url + '/my'
