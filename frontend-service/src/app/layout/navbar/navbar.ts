@@ -46,4 +46,8 @@ export class Navbar {
   goToTourPanel(): void {
     this.router.navigate(['/tours/all']);
   }
+
+  goToBlogs(): void {
+    this.router.navigate(['/blogs']);
+  }
 }

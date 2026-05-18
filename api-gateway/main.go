@@ -26,7 +26,7 @@ func main() {
 	muxRouter.Handle("/api/blogs", middleware.JWTMiddlewareFunc(router.ProxyBlog)).Methods("POST", "GET", "OPTIONS")
 	muxRouter.Handle("/api/blogs/{id}", middleware.JWTMiddlewareFunc(router.ProxyBlog)).Methods("GET", "OPTIONS")
 	muxRouter.Handle("/api/blogs/{blogId}/likes", middleware.JWTMiddlewareFunc(router.ProxyBlog)).Methods("POST", "DELETE", "OPTIONS")
-	muxRouter.Handle("/api/blogs/{blogId}/comments", middleware.JWTMiddlewareFunc(router.ProxyBlog)).Methods("GET", "OPTIONS")
+	muxRouter.Handle("/api/blogs/{blogId}/comments", middleware.JWTMiddlewareFunc(router.ProxyBlog)).Methods("GET", "POST", "OPTIONS")
 	muxRouter.Handle("/api/comments", middleware.JWTMiddlewareFunc(router.ProxyBlog)).Methods("POST", "GET", "OPTIONS")
 	muxRouter.Handle("/api/comments/{id}", middleware.JWTMiddlewareFunc(router.ProxyBlog)).Methods("PUT", "OPTIONS")
 
