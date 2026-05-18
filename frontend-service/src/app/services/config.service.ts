@@ -5,9 +5,12 @@ import { Injectable } from '@angular/core';
 })
 export class ConfigService {
 
-  private _api_url = 'http://localhost:8080/api';
-  private _tour_api_url = 'http://localhost:55814/api';
-  private _auth_url = 'http://localhost:8080/auth';
+  private _api_url = 'http://localhost:8081/api';
+  private _tour_api_url = 'http://localhost:8082/api';
+  private _auth_url = 'http://localhost:8081/auth';
+  //private _api_url = 'http://stakeholders-service:8080/api';
+  //private _tour_api_url = 'http://tour-service:8080/api';
+  //private _auth_url = 'http://stakeholders-service:8080/auth';
   private _user_url = this._api_url + '/user';
   private _tours_url = this._tour_api_url + '/tours';
 
