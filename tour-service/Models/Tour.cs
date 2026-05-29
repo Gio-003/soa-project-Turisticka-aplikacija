@@ -20,5 +20,7 @@ namespace tour_service.Models
         public int AuthorId { get; set; }
 
         public List<KeyPoints> KeyPoints { get; set; } = new();
+
+        public List<TourDuration> Durations { get; set; } = new();
     }
 }

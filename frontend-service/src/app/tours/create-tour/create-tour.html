@@ -22,6 +22,30 @@
       <label for="tourTags">Tags</label>
       <input id="tourTags" type="text" formControlName="tags" placeholder="e.g., history, architecture, food" />
 
+      <!-- TOUR DURATIONS -->
+      <div class="duration-section">
+        <h4>Tour Durations</h4>
+
+        <select [(ngModel)]="newDuration.transportType" [ngModelOptions]="{ standalone: true }">
+          <option value="Walking">Walking</option>
+          <option value="Bicycle">Bicycle</option>
+          <option value="Car">Car</option>
+        </select>
+
+        <input type="number" [(ngModel)]="newDuration.durationInMinutes" name="duration"
+          [ngModelOptions]="{ standalone: true }" placeholder="Minutes" />
+
+        <button type="button" (click)="addDuration()">
+          + Add Duration
+        </button>
+
+        <ul *ngIf="durations.length > 0">
+          <li *ngFor="let d of durations">
+            {{ d.transportType }} - {{ d.durationInMinutes }} min
+          </li>
+        </ul>
+      </div>
+
       <!-- PRIKAZ DODATIH KLJUČNIH TAČAKA -->
       <div class="added-points-list" *ngIf="keyPoints.length > 0">
         <h4>Added Key Points ({{ keyPoints.length }})</h4>
@@ -45,22 +69,20 @@
 
   <!-- DESNA KOLONA: MAPA I FORMA ZA KLJUČNU TAČKU -->
   <div class="map-section">
-    <app-map 
-      mode="create" 
-      [tourPoints]="keyPoints" 
-      (onPointSelected)="handlePointSelected($event)">
+    <app-map mode="create" [tourPoints]="keyPoints" (onPointSelected)="handlePointSelected($event)">
     </app-map>
 
     <div class="keypoint-config-form" [class.visible]="isPointSelected">
       <h3>Configure Key Point</h3>
-      <p class="coords-info">Coords: {{ currentPoint.lat | number:'1.4-4' }}, {{ currentPoint.lng | number:'1.4-4' }}</p>
-      
+      <p class="coords-info">Coords: {{ currentPoint.lat | number:'1.4-4' }}, {{ currentPoint.lng | number:'1.4-4' }}
+      </p>
+
       <label for="kpName">Key Point Name</label>
       <input id="kpName" type="text" [(ngModel)]="currentPoint.name" placeholder="e.g., National Museum" />
-      
+
       <label for="kpDesc">Description</label>
       <textarea id="kpDesc" [(ngModel)]="currentPoint.description" placeholder="A short description..."></textarea>
-      
+
       <label for="kpImage">Image URL</label>
       <input id="kpImage" type="text" [(ngModel)]="currentPoint.image" placeholder="https://example.com/image.jpg" />
 

@@ -6,15 +6,20 @@ import { KeyPoint } from '../../shared/map/map.component';
 import { TourService } from '../../services/tour.service';
 import { UserService } from '../../services/user.service';
 
+export interface TourDuration {
+  transportType: 'Walking' | 'Bicycle' | 'Car';
+  durationInMinutes: number;
+}
+
 export interface CreateTourRequest {
   name: string;
   description: string;
   difficulty: string;
   tags: string[];
   keyPoints: KeyPoint[];
-  authorId: number; 
+  durations: TourDuration[];   // NOVO
+  authorId: number;
 }
-
 @Component({
   selector: 'app-create-tour',
   standalone: true,
@@ -26,23 +31,30 @@ export class CreateTour implements OnInit {
   form!: FormGroup;
   submitted = false;
   notification: any;
-  
-  keyPoints: KeyPoint[] = []; 
-  isPointSelected = false;    
-  currentPoint: KeyPoint = { lat: 0, lng: 0, name: '', description: '', image: '' }; 
+
+  keyPoints: KeyPoint[] = [];
+  isPointSelected = false;
+  currentPoint: KeyPoint = { lat: 0, lng: 0, name: '', description: '', image: '' };
+
+  durations: TourDuration[] = [];
+
+  newDuration: TourDuration = {
+    transportType: 'Walking',
+    durationInMinutes: 0
+  };
 
   constructor(
     private fb: FormBuilder,
     private tourService: TourService,
     public userService: UserService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.form = this.fb.group({
       name: ['', Validators.required],
       description: ['', Validators.required],
       difficulty: ['', Validators.required],
-      tags: ['']
+      tags: [''],
     });
   }
 
@@ -67,7 +79,28 @@ export class CreateTour implements OnInit {
     this.isPointSelected = false;
     this.currentPoint = { lat: 0, lng: 0, name: '', description: '', image: '' };
   }
-  
+
+  addDuration(): void {
+    const minutes = Number(this.newDuration.durationInMinutes);
+
+    if (!minutes || minutes <= 0) {
+      alert('Unesite validno vreme');
+      return;
+    }
+
+    const durationToAdd: TourDuration = {
+      transportType: this.newDuration.transportType,
+      durationInMinutes: minutes
+    };
+
+    this.durations = [...this.durations, durationToAdd];
+
+    this.newDuration = {
+      transportType: this.newDuration.transportType,
+      durationInMinutes: 0
+    };
+  }
+
   onSubmit(): void {
     // Provera validnosti forme I da li postoji bar jedna ključna tačka
     if (this.form.invalid || this.keyPoints.length === 0) {
@@ -90,6 +123,7 @@ export class CreateTour implements OnInit {
         ? formValue.tags.split(',').map((t: string) => t.trim())
         : [],
       keyPoints: this.keyPoints, // Sakupljene tačke sa mape ubacujemo u zahtev
+      durations: this.durations,
       authorId: this.userService.currentUser.Id
     };
 
@@ -103,7 +137,7 @@ export class CreateTour implements OnInit {
 
         // Resetujemo formu i praznimo tačke sa mape nakon uspešnog čuvanja
         this.form.reset();
-        this.keyPoints = []; 
+        this.keyPoints = [];
         this.submitted = false;
       },
       error: () => {

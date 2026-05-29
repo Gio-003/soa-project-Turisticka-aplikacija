@@ -5,7 +5,7 @@ using tour_service.DTO;
 namespace tour_service.Controllers
 {
     [ApiController]
-    [Route("tours/{tourId}/keypoints")]
+    [Route("api/tours/{tourId}/keypoints")]
     public class KeyPointController : Controller
     {
         private readonly KeyPointService _service;

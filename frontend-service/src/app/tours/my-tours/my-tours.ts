@@ -15,6 +15,10 @@ export interface TourResponse {
   authorId: number;
   tags: string[];
   keyPoints?: any[];
+  durations?: {
+    transportType: 'Walking' | 'Bicycle' | 'Car';
+    durationInMinutes: number;
+  }[];
 }
 
 @Component({
@@ -35,7 +39,7 @@ export class MyTours implements OnInit {
     private tourService: TourService,
     public userService: UserService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const interval = setInterval(() => {
@@ -69,6 +73,19 @@ export class MyTours implements OnInit {
         console.error('Error loading my tours:', err);
       }
     });
+  }
+
+  getTransportIcon(type: string): string {
+    switch (type) {
+      case 'Walking':
+        return '🚶';
+      case 'Bicycle':
+        return '🚴';
+      case 'Car':
+        return '🚗';
+      default:
+        return '📍';
+    }
   }
 
   selectTour(tour: TourResponse): void {

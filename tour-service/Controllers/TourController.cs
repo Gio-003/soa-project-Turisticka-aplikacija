@@ -6,7 +6,7 @@ using System;
 namespace MyApp.Controllers
 {
     [ApiController]
-    [Route("tours")]
+    [Route("api/tours")]
     public class TourController : ControllerBase
     {
         private readonly TourService _tourService;

@@ -15,6 +15,7 @@ namespace tour_service.Data
         public DbSet<Tour> Tours { get; set; }
         public DbSet<TourTag> TourTags { get; set; }
         public DbSet<Review> Reviews { get; set; }
+        public DbSet<TourDuration> TourDurations { get; set; } // NOVO
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -108,6 +109,29 @@ namespace tour_service.Data
                 entity.HasOne(r => r.Tour)
                       .WithMany()
                       .HasForeignKey(r => r.TourId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // =========================
+            // TOUR DURATION (NOVO)
+            // =========================
+            modelBuilder.Entity<TourDuration>(entity =>
+            {
+                entity.HasKey(td => td.Id);
+
+                entity.Property(td => td.TransportType)
+                      .IsRequired();
+
+                entity.Property(td => td.DurationInMinutes)
+                      .IsRequired();
+
+                entity.Property(td => td.TourId)
+                      .IsRequired();
+
+                // RELATION: TourDuration -> Tour
+                entity.HasOne(td => td.Tour)
+                      .WithMany(t => t.Durations)
+                      .HasForeignKey(td => td.TourId)
                       .OnDelete(DeleteBehavior.Cascade);
             });
         }

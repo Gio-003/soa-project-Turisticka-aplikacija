@@ -25,6 +25,7 @@ namespace tour_service.Repositories
             return _context.Tours
                 .Include(t => t.Tags)
                 .Include(t => t.KeyPoints)
+                .Include(t => t.Durations)
                 .FirstOrDefault(t => t.Id == id);
         }
 
@@ -34,11 +35,13 @@ namespace tour_service.Repositories
             _context.SaveChanges();
             return tour;
         }
+
         public Tour Delete(Guid id)
         {
             var tour = _context.Tours
                 .Include(t => t.Tags)
                 .Include(t => t.KeyPoints)
+                .Include(t => t.Durations)
                 .FirstOrDefault(t => t.Id == id);
 
             if (tour != null)
@@ -55,6 +58,7 @@ namespace tour_service.Repositories
             return _context.Tours
                 .Include(t => t.Tags)
                 .Include(t => t.KeyPoints)
+                .Include(t => t.Durations)
                 .ToList();
         }
 
@@ -63,6 +67,7 @@ namespace tour_service.Repositories
             return _context.Tours
                 .Include(t => t.Tags)
                 .Include(t => t.KeyPoints)
+                .Include(t => t.Durations)
                 .Where(t => t.AuthorId == authorId)
                 .ToList();
         }
@@ -72,6 +77,7 @@ namespace tour_service.Repositories
             return _context.Tours
                 .Include(t => t.Tags)
                 .Include(t => t.KeyPoints)
+                .Include(t => t.Durations)
                 .Where(t => t.Status == Enum.TourStatus.Published)
                 .ToList();
         }

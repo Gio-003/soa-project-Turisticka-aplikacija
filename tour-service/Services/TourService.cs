@@ -50,8 +50,17 @@ namespace tour_service.Services
                         Latitude = kp.Lat,   // 'lat' sa fronta ide u 'Latitude' u bazi
                         Longitude = kp.Lng   // 'lng' sa fronta ide u 'Longitude' u bazi
                     }).ToList()
-                    : new List<KeyPoints>()
-            };
+                    : new List<KeyPoints>(),
+
+                Durations = request.Durations != null
+                    ? request.Durations.Select(d => new TourDuration
+                    {
+                        Id = Guid.NewGuid(),
+                        TransportType = d.TransportType,
+                        DurationInMinutes = d.DurationInMinutes
+                    }).ToList()
+                    : new List<TourDuration>(),
+                            };
 
             _context.Tours.Add(tour);
             _context.SaveChanges();
@@ -85,7 +94,13 @@ namespace tour_service.Services
                         ImageUrl = kp.ImageUrl,
                         Latitude = kp.Latitude,
                         Longitude = kp.Longitude
-                    }).ToList()
+                    }).ToList(),
+
+                    Durations = t.Durations.Select(d => new TourDurationResponse
+                    {
+                        TransportType = d.TransportType,
+                        DurationInMinutes = d.DurationInMinutes
+                    }).ToList(),
                 })
                 .ToList();
         }
