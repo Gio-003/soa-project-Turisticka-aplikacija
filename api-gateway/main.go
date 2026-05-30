@@ -1,6 +1,7 @@
 package main
 
 import (
+	grpcclient "api-gateway/grpc"
 	"api-gateway/middleware"
 	"api-gateway/router"
 	"log"
@@ -10,9 +11,12 @@ import (
 )
 
 func main() {
-	muxRouter := mux.NewRouter()
 
 	// CORS middleware na svim rutama
+
+	grpcclient.InitBlogClient()
+	defer grpcclient.CloseBlogClient()
+	muxRouter := mux.NewRouter()
 	muxRouter.Use(middleware.CORSMiddleware)
 
 	// Health check
@@ -22,9 +26,13 @@ func main() {
 	muxRouter.HandleFunc("/api/auth/login", router.ProxyAuth).Methods("POST", "OPTIONS")
 	muxRouter.HandleFunc("/api/auth/signup", router.ProxyAuth).Methods("POST", "OPTIONS")
 
+	//GRPC ZA BLOG SERVICE
 	// Blog rute - SA JWT-om
-	muxRouter.Handle("/api/blogs", middleware.JWTMiddlewareFunc(router.ProxyBlog)).Methods("POST", "GET", "OPTIONS")
-	muxRouter.Handle("/api/blogs/{id}", middleware.JWTMiddlewareFunc(router.ProxyBlog)).Methods("GET", "OPTIONS")
+	muxRouter.Handle("/api/blogs", middleware.JWTMiddlewareFunc(router.GetAllBlogsGrpc)).Methods("GET", "OPTIONS")
+	muxRouter.Handle("/api/blogs/{id}", middleware.JWTMiddlewareFunc(router.GetBlogByIDGrpc)).Methods("GET", "OPTIONS")
+
+	muxRouter.Handle("/api/blogs", middleware.JWTMiddlewareFunc(router.ProxyBlog)).Methods("POST", "OPTIONS")
+
 	muxRouter.Handle("/api/blogs/{blogId}/likes", middleware.JWTMiddlewareFunc(router.ProxyBlog)).Methods("POST", "DELETE", "OPTIONS")
 	muxRouter.Handle("/api/blogs/{blogId}/comments", middleware.JWTMiddlewareFunc(router.ProxyBlog)).Methods("GET", "POST", "OPTIONS")
 	muxRouter.Handle("/api/comments", middleware.JWTMiddlewareFunc(router.ProxyBlog)).Methods("POST", "GET", "OPTIONS")
