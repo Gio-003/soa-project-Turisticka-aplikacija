@@ -20,7 +20,6 @@ namespace MyApp.Controllers
         public IActionResult CreateTour([FromBody] CreateTourRequest request)
         {
             var tourResponse = _tourService.CreateTour(request);
-
             return Ok(tourResponse);
         }
 
@@ -36,6 +35,20 @@ namespace MyApp.Controllers
         {
             var tours = _tourService.GetAllTours();
             return Ok(tours);
+        }
+
+        [HttpPost("{id}/publish")]
+        public IActionResult PublishTour(Guid id)
+        {
+            var tour = _tourService.PublishTour(id);
+            return Ok(tour);
+        }
+
+        [HttpPost("{id}/archive")]
+        public IActionResult ArchiveTour(Guid id)
+        {
+            var tour = _tourService.ArchiveTour(id);
+            return Ok(tour);
         }
     }
 }

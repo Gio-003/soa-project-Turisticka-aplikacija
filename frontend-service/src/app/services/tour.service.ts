@@ -31,9 +31,24 @@ export class TourService {
       `${this.config.tours_url}/my/${authorId}`
     );
   }
+
   getAllTours() {
     return this.apiService.get(
       this.config.tours_url + '/all'
+    );
+  }
+
+  publishTour(id: string) {
+    return this.apiService.post(
+      `${this.config.tours_url}/${id}/publish`,
+      {}
+    );
+  }
+
+  archiveTour(id: string) {
+    return this.apiService.post(
+      `${this.config.tours_url}/${id}/archive`,
+      {}
     );
   }
 }

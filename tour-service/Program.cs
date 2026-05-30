@@ -29,6 +29,8 @@ builder.Services.AddScoped<ReviewRepository>();
 builder.Services.AddScoped<KeyPointService>();
 builder.Services.AddScoped<TourService>();
 builder.Services.AddScoped<ReviewService>();
+builder.Services.AddScoped<TourDurationRepository>();
+builder.Services.AddScoped<TourDurationService>();
 
 builder.Services.AddCors(options => //dodato odavde 
 {
