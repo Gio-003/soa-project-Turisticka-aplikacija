@@ -1,14 +1,21 @@
-﻿namespace tour_service.DTO
+﻿using tour_service.Enum;
+
+namespace tour_service.DTO
 {
     public class CreateTourRequest
     {
         public string Name { get; set; }
+
         public string Description { get; set; }
+
         public string Difficulty { get; set; }
 
         public List<string> Tags { get; set; }
 
         public List<KeyPointFromFrontDTO> KeyPoints { get; set; } = new();
+
+        // NOVO
+        public List<TourDurationDTO> Durations { get; set; } = new();
 
         public int AuthorId { get; set; }
     }
@@ -16,9 +23,21 @@
     public class KeyPointFromFrontDTO
     {
         public string Name { get; set; }
+
         public string Description { get; set; }
-        public string Image { get; set; } // Povezuje se sa 'image' iz Angulara
-        public double Lat { get; set; }   // Povezuje se sa 'lat' iz Angulara
-        public double Lng { get; set; }   // Povezuje se sa 'lng' iz Angulara
+
+        public string Image { get; set; }
+
+        public double Lat { get; set; }
+
+        public double Lng { get; set; }
+    }
+
+    // NOVO
+    public class TourDurationDTO
+    {
+        public TransportType TransportType { get; set; }
+
+        public int DurationInMinutes { get; set; }
     }
 }

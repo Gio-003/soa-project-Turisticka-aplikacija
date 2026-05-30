@@ -27,11 +27,14 @@ namespace tour_service.Services
                 Name = request.Name,
                 Description = request.Description,
                 Difficulty = request.Difficulty,
-
                 AuthorId = request.AuthorId,
 
                 Status = TourStatus.Draft,
                 Price = 0,
+
+                // NOVO: inicijalno null
+                PublishedAt = null,
+                ArchivedAt = null,
 
                 Tags = request.Tags != null
                     ? request.Tags.Select(tag => new TourTag
@@ -46,11 +49,20 @@ namespace tour_service.Services
                         Id = Guid.NewGuid(),
                         Name = kp.Name,
                         Description = kp.Description,
-                        ImageUrl = kp.Image, // 'image' sa fronta ide u 'ImageUrl' u bazi
-                        Latitude = kp.Lat,   // 'lat' sa fronta ide u 'Latitude' u bazi
-                        Longitude = kp.Lng   // 'lng' sa fronta ide u 'Longitude' u bazi
+                        ImageUrl = kp.Image,
+                        Latitude = kp.Lat,
+                        Longitude = kp.Lng
                     }).ToList()
-                    : new List<KeyPoints>()
+                    : new List<KeyPoints>(),
+
+                Durations = request.Durations != null
+                    ? request.Durations.Select(d => new TourDuration
+                    {
+                        Id = Guid.NewGuid(),
+                        TransportType = d.TransportType,
+                        DurationInMinutes = d.DurationInMinutes
+                    }).ToList()
+                    : new List<TourDuration>(),
             };
 
             _context.Tours.Add(tour);
@@ -59,7 +71,42 @@ namespace tour_service.Services
             return tour;
         }
 
-        // GET TOURS BY AUTHOR (RETURN DTO, NOT ENTITY)
+        // PUBLISH TOUR
+        public Tour PublishTour(Guid tourId)
+        {
+            var tour = _context.Tours.FirstOrDefault(t => t.Id == tourId);
+
+            if (tour == null)
+                throw new Exception("Tour not found");
+
+            tour.Status = TourStatus.Published;
+            tour.PublishedAt = DateTime.UtcNow;
+
+            // ako se ponovo publishuje posle arhive
+            tour.ArchivedAt = null;
+
+            _context.SaveChanges();
+
+            return tour;
+        }
+
+        // ARCHIVE TOUR
+        public Tour ArchiveTour(Guid tourId)
+        {
+            var tour = _context.Tours.FirstOrDefault(t => t.Id == tourId);
+
+            if (tour == null)
+                throw new Exception("Tour not found");
+
+            tour.Status = TourStatus.Archived;
+            tour.ArchivedAt = DateTime.UtcNow;
+
+            _context.SaveChanges();
+
+            return tour;
+        }
+
+        // GET TOURS BY AUTHOR
         public List<TourResponse> GetToursByAuthor(int authorId)
         {
             return _context.Tours
@@ -85,10 +132,17 @@ namespace tour_service.Services
                         ImageUrl = kp.ImageUrl,
                         Latitude = kp.Latitude,
                         Longitude = kp.Longitude
-                    }).ToList()
+                    }).ToList(),
+
+                    Durations = t.Durations.Select(d => new TourDurationResponse
+                    {
+                        TransportType = d.TransportType,
+                        DurationInMinutes = d.DurationInMinutes
+                    }).ToList(),
                 })
                 .ToList();
         }
+
         public List<Tour> GetAllTours()
         {
             return _repository.GetAll();

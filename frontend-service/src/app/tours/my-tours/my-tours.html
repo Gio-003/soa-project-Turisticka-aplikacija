@@ -17,9 +17,7 @@
     </div>
 
     <ul class="tours-list">
-      <li *ngFor="let tour of tours"
-          (click)="selectTour(tour)"
-          [class.active]="selectedTour?.id === tour.id">
+      <li *ngFor="let tour of tours" (click)="selectTour(tour)" [class.active]="selectedTour?.id === tour.id">
 
         <h3>{{ tour.name }}</h3>
 
@@ -48,6 +46,20 @@
       <p><b>Difficulty:</b> {{ selectedTour.difficulty }}</p>
       <p><b>Price:</b> {{ selectedTour.price }} €</p>
       <p><b>Status:</b> {{ selectedTour.status }}</p>
+      <!-- ACTION BUTTONS -->
+      <div class="tour-actions">
+
+        <button type="button" class="btn tour-btn" (click)="publishTour(selectedTour.id)"
+          *ngIf="selectedTour.status !== 'Published'">
+          Publish tour
+        </button>
+
+        <button type="button" class="btn tour-btn" (click)="archiveTour(selectedTour.id)"
+          *ngIf="selectedTour.status == 'Published'">
+          Archive tour
+        </button>
+
+      </div>
 
       <!-- TAGS -->
       <p>
@@ -57,13 +69,26 @@
         </span>
       </p>
 
+      <!-- DURATIONS -->
+      <div *ngIf="selectedTour?.durations?.length">
+
+        <h3>Durations</h3>
+
+        <ul>
+          <li *ngFor="let d of selectedTour.durations">
+            {{ getTransportIcon(d.transportType) }}
+            {{ d.transportType }} - {{ d.durationInMinutes }} min
+          </li>
+        </ul>
+      </div>
+
       <hr />
 
       <!-- MAP -->
-      <app-map
-        [mode]="'view'"
-        [tourPoints]="mapKeyPoints">
+      <app-map [mode]="'view'" [tourPoints]="mapKeyPoints">
       </app-map>
+
+      <br />
 
       <!-- KEY POINTS -->
       <div class="key-points-list">
@@ -80,6 +105,51 @@
 
           </li>
         </ul>
+
+      </div>
+
+      <div class="duration-section" *ngIf="!hasTourDurations(selectedTour)">
+
+        <h3>Add tour duration</h3>
+
+        <select [(ngModel)]="newDuration.transportType" [ngModelOptions]="{ standalone: true }">
+
+          <option value="Walking">Walking</option>
+          <option value="Bicycle">Bicycle</option>
+          <option value="Car">Car</option>
+
+        </select>
+
+        <input type="number" [(ngModel)]="newDuration.durationInMinutes" [ngModelOptions]="{ standalone: true }"
+          placeholder="Minutes" />
+
+        <button type="button" (click)="addDuration()">
+          + Add Duration
+        </button>
+
+      </div>
+
+      <!-- NOVO: LISTA NOVO DODATIH DURATIONS (LOCAL STATE) -->
+      <div *ngIf="durations.length > 0">
+
+        <h3>New Durations (not saved yet)</h3>
+
+        <ul>
+          <li *ngFor="let d of durations; let i = index">
+
+            {{ getTransportIcon(d.transportType) }}
+            {{ d.transportType }} - {{ d.durationInMinutes }} min
+
+            <button type="button" (click)="removeDuration(i)">
+              ❌
+            </button>
+
+          </li>
+        </ul>
+
+        <button type="button" class="tour-btn" (click)="saveDuration()">
+          Save tour durations
+        </button>
 
       </div>
 

@@ -57,58 +57,6 @@ namespace tour_service.Migrations
                     b.ToTable("KeyPoints", "tour");
                 });
 
-            modelBuilder.Entity("tour_service.Models.Tour", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("AuthorId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Difficulty")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Tours", "tour");
-                });
-
-            modelBuilder.Entity("tour_service.Models.TourTag", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("TourId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TourId");
-
-                    b.ToTable("TourTags", "tour");
-                });
-
             modelBuilder.Entity("tour_service.Models.Review", b =>
                 {
                     b.Property<Guid>("Id")
@@ -149,21 +97,90 @@ namespace tour_service.Migrations
                     b.ToTable("Reviews", "tour");
                 });
 
-            modelBuilder.Entity("tour_service.Models.KeyPoints", b =>
+            modelBuilder.Entity("tour_service.Models.Tour", b =>
                 {
-                    b.HasOne("tour_service.Models.Tour", "Tour")
-                        .WithMany("KeyPoints")
-                        .HasForeignKey("TourId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
 
-                    b.Navigation("Tour");
+                    b.Property<DateTime?>("ArchivedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("AuthorId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Difficulty")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("PublishedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tours", "tour");
+                });
+
+            modelBuilder.Entity("tour_service.Models.TourDuration", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("DurationInMinutes")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("TourId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("TransportType")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TourId");
+
+                    b.ToTable("TourDurations", "tour");
                 });
 
             modelBuilder.Entity("tour_service.Models.TourTag", b =>
                 {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("TourId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TourId");
+
+                    b.ToTable("TourTags", "tour");
+                });
+
+            modelBuilder.Entity("tour_service.Models.KeyPoints", b =>
+                {
                     b.HasOne("tour_service.Models.Tour", "Tour")
-                        .WithMany("Tags")
+                        .WithMany("KeyPoints")
                         .HasForeignKey("TourId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -182,8 +199,32 @@ namespace tour_service.Migrations
                     b.Navigation("Tour");
                 });
 
+            modelBuilder.Entity("tour_service.Models.TourDuration", b =>
+                {
+                    b.HasOne("tour_service.Models.Tour", "Tour")
+                        .WithMany("Durations")
+                        .HasForeignKey("TourId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tour");
+                });
+
+            modelBuilder.Entity("tour_service.Models.TourTag", b =>
+                {
+                    b.HasOne("tour_service.Models.Tour", "Tour")
+                        .WithMany("Tags")
+                        .HasForeignKey("TourId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tour");
+                });
+
             modelBuilder.Entity("tour_service.Models.Tour", b =>
                 {
+                    b.Navigation("Durations");
+
                     b.Navigation("KeyPoints");
 
                     b.Navigation("Tags");
