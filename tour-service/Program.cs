@@ -32,7 +32,7 @@ builder.Services.AddScoped<ReviewService>();
 builder.Services.AddScoped<TourDurationRepository>();
 builder.Services.AddScoped<TourDurationService>();
 
-builder.Services.AddCors(options => //dodato odavde 
+/*builder.Services.AddCors(options => //dodato odavde 
 {
     options.AddPolicy("AllowAngular", policy =>
     {
@@ -42,7 +42,7 @@ builder.Services.AddCors(options => //dodato odavde
             .AllowAnyMethod()
             .AllowCredentials();
     });
-}); //do ovde
+}); //do ovde */
 
 var app = builder.Build();
 
@@ -52,9 +52,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseRouting(); // dodato
+//app.UseRouting(); // dodato
 
-app.UseCors("AllowAngular"); // dodato
+//app.UseCors("AllowAngular"); // dodato
 
 app.UseAuthentication();
 app.UseAuthorization();
