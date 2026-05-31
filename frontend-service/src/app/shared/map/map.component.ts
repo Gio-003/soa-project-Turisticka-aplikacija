@@ -29,6 +29,7 @@ export class MapComponent implements AfterViewInit, OnChanges {
   
   @Output() onPointSelected = new EventEmitter<KeyPoint>(); 
   @Output() onPointMoved = new EventEmitter<{ index: number, lat: number, lng: number }>(); 
+  @Output() tourLengthChanged = new EventEmitter<number>();
 
   constructor(private mapService: MapService) {}
 
@@ -141,23 +142,24 @@ setRoute(points: KeyPoint[]): void {
     } catch (e) {}
     this.routeControl = null;
   }
-  
-  const waypoints = points.map(p => L.latLng(p.lat, p.lng));
-  
-  try {
-    this.routeControl = (L.Routing as any).control({
-      waypoints: waypoints,
-      addWaypoints: false,
-      draggableWaypoints: false,
-      show: false
-    }).addTo(this.map);
-  } catch (e) {
-    console.warn('Routing control error:', e);
-  }
-}
 
-  private clearMarkers(): void {
-    this.markers.forEach(m => this.map.removeLayer(m));
-    this.markers = [];
-  }
+  const waypoints = points.map(p => L.latLng(p.lat, p.lng));
+
+  this.routeControl = (L.Routing as any).control({
+    waypoints: waypoints,
+    addWaypoints: false,
+    draggableWaypoints: false,
+    show: false
+  }).addTo(this.map);
+
+  this.routeControl.on('routesfound', (e: any) => {
+    const route = e.routes[0];
+
+    // distance je u metrima
+    const distanceKm = route.summary.totalDistance / 1000;
+
+    console.log('Dužina ture:', distanceKm);
+
+    this.tourLengthChanged.emit(distanceKm);
+  });
 }
