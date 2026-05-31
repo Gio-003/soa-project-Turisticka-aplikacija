@@ -162,5 +162,10 @@ namespace tour_service.Services
 
             return tour;
         }
+
+        public Tour GetTourById(Guid tourId)
+        {
+            return _repository.GetById(tourId);
+        }
     }
 }

@@ -15,7 +15,7 @@ import com.example.stakeholders.service.inter.UserService;
 
 @RestController
 @CrossOrigin
-@RequestMapping(value = "/api", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
 public class UserController {
     @Autowired
     private UserService userService;

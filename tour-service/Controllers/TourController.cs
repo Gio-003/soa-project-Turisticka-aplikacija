@@ -6,7 +6,7 @@ using System;
 namespace MyApp.Controllers
 {
     [ApiController]
-    [Route("api/tours")]
+    [Route("tours")]
     public class TourController : ControllerBase
     {
         private readonly TourService _tourService;
@@ -35,6 +35,15 @@ namespace MyApp.Controllers
         {
             var tours = _tourService.GetAllTours();
             return Ok(tours);
+        }
+
+        [HttpGet("{id}")]
+        public IActionResult GetTourById(Guid id)
+        {
+            var tour = _tourService.GetTourById(id);
+            if (tour == null)
+                return NotFound(new { error = "Tour not found" });
+            return Ok(tour);
         }
 
         [HttpPost("{id}/publish")]

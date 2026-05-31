@@ -135,31 +135,39 @@ export class MapComponent implements AfterViewInit, OnChanges {
     }
   }
 
-setRoute(points: KeyPoint[]): void {
-  if (this.routeControl) {
-    try {
-      this.map.removeControl(this.routeControl);
-    } catch (e) {}
-    this.routeControl = null;
+  private clearMarkers(): void {
+    this.markers.forEach(marker => {
+      this.map.removeLayer(marker);
+    });
+    this.markers = [];
   }
 
-  const waypoints = points.map(p => L.latLng(p.lat, p.lng));
+  private setRoute(points: KeyPoint[]): void {
+    if (this.routeControl) {
+      try {
+        this.map.removeControl(this.routeControl);
+      } catch (e) {}
+      this.routeControl = null;
+    }
 
-  this.routeControl = (L.Routing as any).control({
-    waypoints: waypoints,
-    addWaypoints: false,
-    draggableWaypoints: false,
-    show: false
-  }).addTo(this.map);
+    const waypoints = points.map(p => L.latLng(p.lat, p.lng));
 
-  this.routeControl.on('routesfound', (e: any) => {
-    const route = e.routes[0];
+    this.routeControl = (L.Routing as any).control({
+      waypoints: waypoints,
+      addWaypoints: false,
+      draggableWaypoints: false,
+      show: false
+    }).addTo(this.map);
 
-    // distance je u metrima
-    const distanceKm = route.summary.totalDistance / 1000;
+    this.routeControl.on('routesfound', (e: any) => {
+      const route = e.routes[0];
 
-    console.log('Dužina ture:', distanceKm);
+      // distance je u metrima
+      const distanceKm = route.summary.totalDistance / 1000;
 
-    this.tourLengthChanged.emit(distanceKm);
-  });
+      console.log('Dužina ture:', distanceKm);
+
+      this.tourLengthChanged.emit(distanceKm);
+    });
+  }
 }

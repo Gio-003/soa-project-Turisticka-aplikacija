@@ -5,7 +5,7 @@ using tour_service.DTO;
 namespace tour_service.Controllers
 {
     [ApiController]
-    [Route("api/tours/{tourId}/durations")]
+    [Route("tours/{tourId}/durations")]
     public class TourDurationController : Controller
     {
         private readonly TourDurationService _service;

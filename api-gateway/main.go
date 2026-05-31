@@ -41,6 +41,11 @@ func main() {
 	// Tour rute - SA JWT-om
 	muxRouter.Handle("/api/tours/all", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("GET", "OPTIONS")
 	muxRouter.Handle("/api/tours/my/{authorId}", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("GET", "OPTIONS")
+	muxRouter.Handle("/api/tours/{tourId}/durations/{durationId}", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("PUT", "DELETE", "OPTIONS")
+	muxRouter.Handle("/api/tours/{tourId}/durations", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("POST", "GET", "OPTIONS")
+	muxRouter.Handle("/api/tours/{id}/publish", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("POST", "OPTIONS")
+	muxRouter.Handle("/api/tours/{id}/archive", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("POST", "OPTIONS")
+	muxRouter.Handle("/api/tours/{tourId}/length", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("PUT", "OPTIONS")
 	muxRouter.Handle("/api/tours", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("POST", "GET", "OPTIONS")
 	muxRouter.Handle("/api/tours/{id}", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("GET", "OPTIONS")
 	muxRouter.Handle("/api/tours/{tourId}/keypoints", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("GET", "POST", "OPTIONS")
@@ -60,10 +65,12 @@ func main() {
 	muxRouter.Handle("/api/getMyInfo", middleware.JWTMiddlewareFunc(router.ProxyAuth)).Methods("GET", "OPTIONS")
 	muxRouter.Handle("/api/me", middleware.JWTMiddlewareFunc(router.ProxyAuth)).Methods("GET", "PUT", "OPTIONS")
 	muxRouter.Handle("/api/updateMyInfo", middleware.JWTMiddlewareFunc(router.ProxyAuth)).Methods("PUT", "OPTIONS")
+	muxRouter.Handle("/api/user/all", middleware.JWTMiddlewareFunc(router.ProxyAuth)).Methods("GET", "OPTIONS")
 
 	// Admin rute - SA JWT-om + Admin provjerom
 	muxRouter.Handle("/api/admin/users", middleware.JWTMiddlewareFunc(middleware.AdminMiddlewareFunc(router.ProxyAuth))).Methods("GET", "OPTIONS")
 	muxRouter.Handle("/api/admin/users/{id}/block", middleware.JWTMiddlewareFunc(middleware.AdminMiddlewareFunc(router.ProxyAuth))).Methods("PUT", "OPTIONS")
+	muxRouter.Handle("/api/user/all", middleware.JWTMiddlewareFunc(middleware.AdminMiddlewareFunc(router.ProxyAuth))).Methods("GET", "OPTIONS")
 
 	port := ":8000"
 	log.Println("🚀 API Gateway starting on port" + port)
