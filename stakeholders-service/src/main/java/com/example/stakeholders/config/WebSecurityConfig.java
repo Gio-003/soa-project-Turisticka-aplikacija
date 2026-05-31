@@ -21,7 +21,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 
 @Configuration
 // Injektovanje bean-a za bezbednost
-@EnableWebSecurity
+//@EnableWebSecurity
 
 // Ukljucivanje podrske za anotacije "@Pre*" i "@Post*" koje ce aktivirati autorizacione provere za svaki pristup metodi
 @EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
