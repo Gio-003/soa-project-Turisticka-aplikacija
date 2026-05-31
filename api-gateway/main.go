@@ -3,6 +3,7 @@ package main
 import (
 	"api-gateway/middleware"
 	"api-gateway/router"
+	"api-gateway/handlers" 
 	"log"
 	"net/http"
 
@@ -31,8 +32,8 @@ func main() {
 	muxRouter.Handle("/api/comments/{id}", middleware.JWTMiddlewareFunc(router.ProxyBlog)).Methods("PUT", "OPTIONS")
 
 	// Tour rute - SA JWT-om
-	muxRouter.Handle("/api/tours/all", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("GET", "OPTIONS")
-	muxRouter.Handle("/api/tours/my/{authorId}", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("GET", "OPTIONS")
+	muxRouter.Handle("/api/tours/all", middleware.JWTMiddlewareFunc(handlers.GetAllToursRPC),).Methods("GET")
+	muxRouter.Handle("/api/tours/my/{authorId}", middleware.JWTMiddlewareFunc(handlers.GetMyToursRPC),).Methods("GET")	
 	muxRouter.Handle("/api/tours", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("POST", "GET", "OPTIONS")
 	muxRouter.Handle("/api/tours/{id}", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("GET", "OPTIONS")
 	muxRouter.Handle("/api/tours/{tourId}/keypoints", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("GET", "POST", "OPTIONS")
@@ -40,6 +41,8 @@ func main() {
 	muxRouter.Handle("/api/tours/{tourId}/reviews", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("GET", "POST", "OPTIONS")
 	muxRouter.Handle("/api/tours/{tourId}/durations", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("GET", "POST", "OPTIONS")
 	muxRouter.Handle("/api/tours/{tourId}/durations/{id}", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("PUT", "DELETE", "OPTIONS")
+	muxRouter.Handle("/api/tours/{id}/publish",middleware.JWTMiddlewareFunc(router.ProxyTour),).Methods("POST", "OPTIONS")
+	muxRouter.Handle("/api/tours/{id}/archive",middleware.JWTMiddlewareFunc(router.ProxyTour),).Methods("POST", "OPTIONS")
 
 	// Follower rute - SA JWT-om
 	muxRouter.Handle("/api/followers/{followerId}/follow/{followedId}", middleware.JWTMiddlewareFunc(router.ProxyFollower)).Methods("POST", "DELETE", "OPTIONS")
