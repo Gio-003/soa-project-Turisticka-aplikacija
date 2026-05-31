@@ -22,6 +22,7 @@ namespace tour_service.Models
         public List<KeyPoints> KeyPoints { get; set; } = new();
 
         public List<TourDuration> Durations { get; set; } = new();
+        public double LengthInKm { get; set; }
 
         public DateTime? PublishedAt { get; set; }
 

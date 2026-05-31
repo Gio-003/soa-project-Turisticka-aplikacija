@@ -102,7 +102,8 @@ services:
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: root
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     networks:
       - tourapp-network
 
@@ -114,7 +115,8 @@ services:
     environment:
       ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=tour_db;Username=postgres;Password=root"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     networks:
       - tourapp-network
 

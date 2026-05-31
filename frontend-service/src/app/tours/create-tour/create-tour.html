@@ -55,6 +55,10 @@
           </li>
         </ul>
       </div>
+      <div *ngIf="tourLength > 0">
+        <strong>Total length:</strong>
+        {{ tourLength | number:'1.2-2' }} km
+      </div>
 
       <p *ngIf="notification" [class]="notification.msgType">
         {{ notification.msgBody }}
@@ -69,7 +73,7 @@
 
   <!-- DESNA KOLONA: MAPA I FORMA ZA KLJUČNU TAČKU -->
   <div class="map-section">
-    <app-map mode="create" [tourPoints]="keyPoints" (onPointSelected)="handlePointSelected($event)">
+    <app-map mode="create" [tourPoints]="keyPoints" (onPointSelected)="handlePointSelected($event)" (tourLengthChanged)="onTourLengthChanged($event)">
     </app-map>
 
     <div class="keypoint-config-form" [class.visible]="isPointSelected">

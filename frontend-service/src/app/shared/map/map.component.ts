@@ -1,7 +1,11 @@
 import { Component, AfterViewInit, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import * as L from 'leaflet';
-import 'leaflet-routing-machine'; 
+
 import { MapService } from './map.service';
+
+
+console.log('Leaflet', L);
+console.log('Routing', (L as any).Routing);
 
 export interface KeyPoint {
   id?: string;
@@ -29,6 +33,7 @@ export class MapComponent implements AfterViewInit, OnChanges {
   
   @Output() onPointSelected = new EventEmitter<KeyPoint>(); 
   @Output() onPointMoved = new EventEmitter<{ index: number, lat: number, lng: number }>(); 
+  @Output() tourLengthChanged = new EventEmitter<number>();
 
   constructor(private mapService: MapService) {}
 
@@ -39,6 +44,10 @@ export class MapComponent implements AfterViewInit, OnChanges {
       iconAnchor: [12, 41]
     });
     L.Marker.prototype.options.icon = DefaultIcon;
+    console.log('Leaflet:', L);
+    console.log('Routing:', (L as any).Routing);
+    console.log('Window L:', (window as any).L);
+    console.log('Window Routing:', (window as any).L?.Routing);
     this.initMap();
   }
 
@@ -134,30 +143,45 @@ export class MapComponent implements AfterViewInit, OnChanges {
     }
   }
 
-setRoute(points: KeyPoint[]): void {
-  if (this.routeControl) {
-    try {
-      this.map.removeControl(this.routeControl);
-    } catch (e) {}
-    this.routeControl = null;
+  private clearMarkers(): void {
+    this.markers.forEach(marker => {
+      this.map.removeLayer(marker);
+    });
+    this.markers = [];
   }
-  
-  const waypoints = points.map(p => L.latLng(p.lat, p.lng));
-  
-  try {
-    this.routeControl = (L.Routing as any).control({
+
+  private setRoute(points: KeyPoint[]): void {
+    if (this.routeControl) {
+      try {
+        this.map.removeControl(this.routeControl);
+      } catch (e) {}
+      this.routeControl = null;
+    }
+
+    const waypoints = points.map(p => L.latLng(p.lat, p.lng));
+
+    const routing = (window as any).L.Routing;
+    if (!routing || !routing.control) {
+      console.warn('Leaflet routing module is not available. Skipping route rendering.');
+      return;
+    }
+
+    this.routeControl = routing.control({
       waypoints: waypoints,
       addWaypoints: false,
       draggableWaypoints: false,
       show: false
     }).addTo(this.map);
-  } catch (e) {
-    console.warn('Routing control error:', e);
-  }
-}
+    console.log('Routing:', (L as any).Routing);
+    this.routeControl.on('routesfound', (e: any) => {
+      const route = e.routes[0];
 
-  private clearMarkers(): void {
-    this.markers.forEach(m => this.map.removeLayer(m));
-    this.markers = [];
+      // distance je u metrima
+      const distanceKm =Math.round((route.summary.totalDistance / 1000) * 100) / 100;
+
+      console.log('Dužina ture:', distanceKm);
+
+      this.tourLengthChanged.emit(distanceKm);
+    });
   }
 }

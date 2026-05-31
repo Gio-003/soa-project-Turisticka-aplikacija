@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import com.example.stakeholders.service.inter.UserService;
 
 @RestController
-//@CrossOrigin
+@CrossOrigin
 @RequestMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
 public class UserController {
     @Autowired

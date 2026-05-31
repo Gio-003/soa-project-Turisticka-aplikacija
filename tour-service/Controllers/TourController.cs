@@ -37,6 +37,15 @@ namespace MyApp.Controllers
             return Ok(tours);
         }
 
+        [HttpGet("{id}")]
+        public IActionResult GetTourById(Guid id)
+        {
+            var tour = _tourService.GetTourById(id);
+            if (tour == null)
+                return NotFound(new { error = "Tour not found" });
+            return Ok(tour);
+        }
+
         [HttpPost("{id}/publish")]
         public IActionResult PublishTour(Guid id)
         {
@@ -49,6 +58,17 @@ namespace MyApp.Controllers
         {
             var tour = _tourService.ArchiveTour(id);
             return Ok(tour);
+        }
+        [HttpPut("{tourId}/length")]
+        public IActionResult UpdateLength(Guid tourId,
+         [FromBody] UpdateTourLength request)
+        {
+            var result = _tourService.UpdateLength(
+                tourId,
+                request.LengthInKm
+            );
+
+            return Ok(result);
         }
     }
 }

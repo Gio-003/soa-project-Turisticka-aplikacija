@@ -6,8 +6,14 @@ import (
 	"blog-service/repo"
 	"blog-service/service"
 	"log"
+	"net"
 	"net/http"
 	"os"
+
+	"google.golang.org/grpc"
+
+	grpcserver "blog-service/grpc"
+	pb "blog-service/proto"
 
 	"github.com/gorilla/mux"
 )
@@ -25,6 +31,9 @@ func main() {
 
 	// Inicijalizacija jedinstvenog servisa
 	blogService := &service.BlogService{Repository: blogRepository}
+	grpcBlogServer := &grpcserver.BlogGrpcServer{
+		Service: blogService,
+	}
 
 	// Inicijalizacija jedinstvenog handlera
 	blogHandler := &handler.BlogHandler{Service: blogService}
@@ -41,6 +50,26 @@ func main() {
 
 	// Ruta za dodavanje komentara sada koristi blogHandler
 	router.HandleFunc("/blogs/{blogId}/comments", blogHandler.AddComment).Methods("POST")
+
+	lis, err := net.Listen("tcp", ":50051")
+	if err != nil {
+		log.Fatal("Failed to listen on grpc port: ", err)
+	}
+
+	grpcSrv := grpc.NewServer()
+
+	pb.RegisterBlogServiceServer(
+		grpcSrv,
+		grpcBlogServer,
+	)
+
+	go func() {
+		log.Println("gRPC server started on :50051")
+
+		if err := grpcSrv.Serve(lis); err != nil {
+			log.Fatal("Failed to start grpc server: ", err)
+		}
+	}()
 
 	port := ":" + os.Getenv("PORT")
 	if port == ":" {

@@ -18,6 +18,7 @@ export interface Tour {
   difficulty: string;
   tags: string[];
   keyPoints: ApiKeyPoint[];
+  lengthInKm: number; // Dodato polje za dužinu ture
 }
 
 @Component({
@@ -40,6 +41,7 @@ export class AllToursComponent implements OnInit {
   isFormVisible = false;
   currentPoint: MapKeyPoint = { lat: 0, lng: 0, name: '', description: '', image: '' };
   editingKeyPointId: string | null = null; // ID tačke koja se menja
+  tourLength = 0;
 
   constructor(
     private tourService: TourService,
@@ -75,7 +77,7 @@ export class AllToursComponent implements OnInit {
     this.isEditingKeyPoint = false;
     this.isFormVisible = false;
     this.mapMode = 'view';
-    
+    this.tourLength = tour.lengthInKm;
     // Mapiramo ApiKeyPoint u MapKeyPoint
     this.mapKeyPoints = tour.keyPoints.map(kp => ({
       id: kp.id,
@@ -137,11 +139,17 @@ export class AllToursComponent implements OnInit {
     if (this.isEditingKeyPoint && movedMarker.id === this.editingKeyPointId) {
       this.currentPoint.lat = event.lat;
       this.currentPoint.lng = event.lng;
-    } else {
-      // Ako korisnik samo pomera marker, odmah ažuriramo lokalni objekat u nizu
-      movedMarker.lat = event.lat;
-      movedMarker.lng = event.lng;
     }
+
+    // Uvek pravimo novu referencu niza da MapComponent osvezi rutu
+    this.mapKeyPoints = this.mapKeyPoints.map((p, idx) => {
+      if (idx !== event.index) return p;
+      return {
+        ...p,
+        lat: event.lat,
+        lng: event.lng
+      };
+    });
   }
 
   // 4. Potvrda izmene ili dodavanja nove tačke preko forme
@@ -164,6 +172,7 @@ export class AllToursComponent implements OnInit {
       this.keyPointService.updateKeyPoint(this.selectedTour.id, this.editingKeyPointId, payload)
         .subscribe(updatedKp => {
           // 1. Ažuriramo bekraund model ture
+          
           const apiIndex = this.selectedTour!.keyPoints.findIndex(p => p.id === this.editingKeyPointId);
           if (apiIndex > -1) this.selectedTour!.keyPoints[apiIndex] = updatedKp;
 
@@ -189,7 +198,7 @@ export class AllToursComponent implements OnInit {
       this.keyPointService.addKeyPoint(this.selectedTour.id, payload)
         .subscribe(newKp => {
           this.selectedTour?.keyPoints.push(newKp);
-          
+ 
           this.mapKeyPoints = [...this.mapKeyPoints, {
             id: newKp.id,
             lat: newKp.latitude,
@@ -214,4 +223,16 @@ export class AllToursComponent implements OnInit {
     this.editingKeyPointId = null;
     this.currentPoint = { lat: 0, lng: 0, name: '', description: '', image: '' };
   }
+  onTourLengthChanged(length: number) {
+  this.tourLength = length;
+
+  if (this.selectedTour) {
+    this.selectedTour.lengthInKm = length;
+
+    this.tourService
+      .updateTourLength(this.selectedTour.id, length)
+      .subscribe();
+  }
+}
+
 }

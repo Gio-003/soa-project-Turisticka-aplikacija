@@ -3,6 +3,7 @@ package middleware
 import (
 	"api-gateway/config"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
@@ -20,12 +21,14 @@ func JWTMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
+			log.Printf("JWT missing Authorization header for %s %s", r.Method, r.URL.Path)
 			http.Error(w, `{"error":"missing authorization header"}`, http.StatusUnauthorized)
 			return
 		}
 
 		parts := strings.SplitN(authHeader, " ", 2)
 		if len(parts) != 2 || parts[0] != "Bearer" {
+			log.Printf("JWT invalid Authorization format for %s %s", r.Method, r.URL.Path)
 			http.Error(w, `{"error":"invalid authorization format"}`, http.StatusUnauthorized)
 			return
 		}
@@ -36,12 +39,14 @@ func JWTMiddleware(next http.Handler) http.Handler {
 		})
 
 		if err != nil || !token.Valid {
+			log.Printf("JWT invalid token for %s %s: %v", r.Method, r.URL.Path, err)
 			http.Error(w, `{"error":"invalid token"}`, http.StatusUnauthorized)
 			return
 		}
 
 		claims, ok := token.Claims.(*CustomClaims)
 		if !ok {
+			log.Printf("JWT invalid claims for %s %s", r.Method, r.URL.Path)
 			http.Error(w, `{"error":"invalid token claims"}`, http.StatusUnauthorized)
 			return
 		}

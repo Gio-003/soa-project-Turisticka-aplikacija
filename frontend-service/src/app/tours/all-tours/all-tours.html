@@ -30,7 +30,7 @@
       <h3>{{ selectedTour.name }}</h3>
 
       <app-map [mode]="mapMode" [tourPoints]="mapKeyPoints" (onPointSelected)="handlePointSelected($event)"
-        (onPointMoved)="handlePointMoved($event)">
+        (onPointMoved)="handlePointMoved($event)" (tourLengthChanged)="onTourLengthChanged($event)">
       </app-map>
 
       <!-- TOUR REVIEWS -->
@@ -55,7 +55,7 @@
           <button class="btn-cancel" (click)="cancelEdit()">Cancel</button>
         </div>
       </div>
-
+      <p><strong>Tour length:</strong> {{ selectedTour?.lengthInKm }} km</p>
       <!-- LISTA KLJUČNIH TAČAKA -->
       <div class="key-points-list">
         <h4>Key Points</h4>
