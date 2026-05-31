@@ -139,11 +139,17 @@ export class AllToursComponent implements OnInit {
     if (this.isEditingKeyPoint && movedMarker.id === this.editingKeyPointId) {
       this.currentPoint.lat = event.lat;
       this.currentPoint.lng = event.lng;
-    } else {
-      // Ako korisnik samo pomera marker, odmah ažuriramo lokalni objekat u nizu
-      movedMarker.lat = event.lat;
-      movedMarker.lng = event.lng;
     }
+
+    // Uvek pravimo novu referencu niza da MapComponent osvezi rutu
+    this.mapKeyPoints = this.mapKeyPoints.map((p, idx) => {
+      if (idx !== event.index) return p;
+      return {
+        ...p,
+        lat: event.lat,
+        lng: event.lng
+      };
+    });
   }
 
   // 4. Potvrda izmene ili dodavanja nove tačke preko forme
@@ -221,11 +227,10 @@ export class AllToursComponent implements OnInit {
   this.tourLength = length;
 
   if (this.selectedTour) {
+    this.selectedTour.lengthInKm = length;
+
     this.tourService
-      .updateTourLength(
-        this.selectedTour.id,
-        length
-      )
+      .updateTourLength(this.selectedTour.id, length)
       .subscribe();
   }
 }
