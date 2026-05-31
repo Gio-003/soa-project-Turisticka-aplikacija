@@ -17,5 +17,7 @@ namespace tour_service.DTO
 
         public List<KeyPointResponse> KeyPoints { get; set; }
         public List<TourDurationResponse> Durations { get; set; }
+
+        public double LengthInKm { get; set; }
     }
 }

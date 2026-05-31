@@ -50,5 +50,16 @@ namespace MyApp.Controllers
             var tour = _tourService.ArchiveTour(id);
             return Ok(tour);
         }
+        [HttpPut("{tourId}/length")]
+        public IActionResult UpdateLength(Guid tourId,
+         [FromBody] UpdateTourLength request)
+        {
+            var result = _tourService.UpdateLength(
+                tourId,
+                request.LengthInKm
+            );
+
+            return Ok(result);
+        }
     }
 }

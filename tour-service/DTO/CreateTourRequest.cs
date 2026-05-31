@@ -18,6 +18,8 @@ namespace tour_service.DTO
         public List<TourDurationDTO> Durations { get; set; } = new();
 
         public int AuthorId { get; set; }
+
+           public double LengthInKm { get; set; }
     }
 
     public class KeyPointFromFrontDTO
