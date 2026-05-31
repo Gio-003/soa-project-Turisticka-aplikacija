@@ -1,7 +1,11 @@
 import { Component, AfterViewInit, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import * as L from 'leaflet';
-import 'leaflet-routing-machine'; 
+
 import { MapService } from './map.service';
+
+
+console.log('Leaflet', L);
+console.log('Routing', (L as any).Routing);
 
 export interface KeyPoint {
   id?: string;
@@ -40,6 +44,10 @@ export class MapComponent implements AfterViewInit, OnChanges {
       iconAnchor: [12, 41]
     });
     L.Marker.prototype.options.icon = DefaultIcon;
+    console.log('Leaflet:', L);
+    console.log('Routing:', (L as any).Routing);
+    console.log('Window L:', (window as any).L);
+    console.log('Window Routing:', (window as any).L?.Routing);
     this.initMap();
   }
 
@@ -152,18 +160,24 @@ export class MapComponent implements AfterViewInit, OnChanges {
 
     const waypoints = points.map(p => L.latLng(p.lat, p.lng));
 
-    this.routeControl = (L.Routing as any).control({
+    const routing = (window as any).L.Routing;
+    if (!routing || !routing.control) {
+      console.warn('Leaflet routing module is not available. Skipping route rendering.');
+      return;
+    }
+
+    this.routeControl = routing.control({
       waypoints: waypoints,
       addWaypoints: false,
       draggableWaypoints: false,
       show: false
     }).addTo(this.map);
-
+    console.log('Routing:', (L as any).Routing);
     this.routeControl.on('routesfound', (e: any) => {
       const route = e.routes[0];
 
       // distance je u metrima
-      const distanceKm = route.summary.totalDistance / 1000;
+      const distanceKm =Math.round((route.summary.totalDistance / 1000) * 100) / 100;
 
       console.log('Dužina ture:', distanceKm);
 
