@@ -16,6 +16,7 @@ var ServiceURLs = map[string]string{
 }
 
 // JWT Configuration
+//var JWTSecret = []byte(getEnv("JWT_SECRET", "your-secret-key-change-in-production"))
 var JWTSecret = []byte(getEnv("JWT_SECRET", "somesecret-key-for-jwt-token-has-to-be-512-bits-long-1234567890123456789"))
 
 func getEnv(key, defaultValue string) string {
