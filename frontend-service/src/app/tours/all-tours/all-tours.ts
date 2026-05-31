@@ -18,6 +18,7 @@ export interface Tour {
   difficulty: string;
   tags: string[];
   keyPoints: ApiKeyPoint[];
+  lengthInKm: number; // Dodato polje za dužinu ture
 }
 
 @Component({
@@ -40,6 +41,7 @@ export class AllToursComponent implements OnInit {
   isFormVisible = false;
   currentPoint: MapKeyPoint = { lat: 0, lng: 0, name: '', description: '', image: '' };
   editingKeyPointId: string | null = null; // ID tačke koja se menja
+  tourLength = 0;
 
   constructor(
     private tourService: TourService,
@@ -75,7 +77,7 @@ export class AllToursComponent implements OnInit {
     this.isEditingKeyPoint = false;
     this.isFormVisible = false;
     this.mapMode = 'view';
-    
+    this.tourLength = tour.lengthInKm;
     // Mapiramo ApiKeyPoint u MapKeyPoint
     this.mapKeyPoints = tour.keyPoints.map(kp => ({
       id: kp.id,
@@ -164,6 +166,7 @@ export class AllToursComponent implements OnInit {
       this.keyPointService.updateKeyPoint(this.selectedTour.id, this.editingKeyPointId, payload)
         .subscribe(updatedKp => {
           // 1. Ažuriramo bekraund model ture
+          
           const apiIndex = this.selectedTour!.keyPoints.findIndex(p => p.id === this.editingKeyPointId);
           if (apiIndex > -1) this.selectedTour!.keyPoints[apiIndex] = updatedKp;
 
@@ -189,7 +192,7 @@ export class AllToursComponent implements OnInit {
       this.keyPointService.addKeyPoint(this.selectedTour.id, payload)
         .subscribe(newKp => {
           this.selectedTour?.keyPoints.push(newKp);
-          
+ 
           this.mapKeyPoints = [...this.mapKeyPoints, {
             id: newKp.id,
             lat: newKp.latitude,
@@ -214,4 +217,17 @@ export class AllToursComponent implements OnInit {
     this.editingKeyPointId = null;
     this.currentPoint = { lat: 0, lng: 0, name: '', description: '', image: '' };
   }
+  onTourLengthChanged(length: number) {
+  this.tourLength = length;
+
+  if (this.selectedTour) {
+    this.tourService
+      .updateTourLength(
+        this.selectedTour.id,
+        length
+      )
+      .subscribe();
+  }
+}
+
 }

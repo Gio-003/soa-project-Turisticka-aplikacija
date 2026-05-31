@@ -28,6 +28,7 @@ namespace tour_service.Services
                 Description = request.Description,
                 Difficulty = request.Difficulty,
                 AuthorId = request.AuthorId,
+                LengthInKm = request.LengthInKm,
 
                 Status = TourStatus.Draft,
                 Price = 0,
@@ -146,6 +147,25 @@ namespace tour_service.Services
         public List<Tour> GetAllTours()
         {
             return _repository.GetAll();
+        }
+
+        public Tour UpdateLength(Guid tourId, double length)
+        {
+            var tour = _context.Tours.FirstOrDefault(t => t.Id == tourId);
+
+            if (tour == null)
+                throw new Exception("Tour not found");
+
+            tour.LengthInKm = length;
+
+            _context.SaveChanges();
+
+            return tour;
+        }
+
+        public Tour GetTourById(Guid tourId)
+        {
+            return _repository.GetById(tourId);
         }
     }
 }

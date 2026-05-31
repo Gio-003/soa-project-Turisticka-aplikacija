@@ -56,6 +56,7 @@ namespace tour_service.Data
                 entity.Property(t => t.Name).IsRequired();
                 entity.Property(t => t.Description).IsRequired();
                 entity.Property(t => t.Difficulty).IsRequired();
+                entity.Property(t=>t.LengthInKm).IsRequired();
 
                 entity.Property(t => t.Price)
                       .HasColumnType("decimal(18,2)")

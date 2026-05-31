@@ -51,4 +51,12 @@ export class TourService {
       {}
     );
   }
+  updateTourLength(tourId: string, lengthInKm: number) {
+  return this.apiService.put(
+    `${this.config.tours_url}/${tourId}/length`,
+    {
+      lengthInKm: lengthInKm
+    }
+  );
+}
 }
