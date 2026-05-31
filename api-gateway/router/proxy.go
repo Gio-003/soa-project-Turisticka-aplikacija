@@ -83,8 +83,12 @@ func forwardRequest(w http.ResponseWriter, r *http.Request, targetURL string) {
 	}
 	defer resp.Body.Close()
 
-	// Copy response headers
+	// Copy response headers (skip CORS to avoid duplicate values)
 	for key, values := range resp.Header {
+		switch key {
+		case "Access-Control-Allow-Origin", "Access-Control-Allow-Methods", "Access-Control-Allow-Headers", "Access-Control-Max-Age", "Access-Control-Allow-Credentials":
+			continue
+		}
 		for _, value := range values {
 			w.Header().Add(key, value)
 		}
