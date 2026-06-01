@@ -1,27 +1,36 @@
 .container {
-  max-width: 800px;
-  margin: 20px auto;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+  max-width: 1040px;
+  margin: 24px auto;
+  padding: 0 24px 32px;
 }
 
-.form-group {
-  margin-bottom: 15px;
+.create-panel {
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+}
+
+.form-grid {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
 .form-control {
   width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font: inherit;
 }
 
 .btn {
-  padding: 10px 15px;
+  padding: 10px 16px;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
+  font-weight: 600;
 }
 
 .btn-primary {
@@ -50,10 +59,24 @@
 }
 
 .blog-post {
-  margin-top: 20px;
-  padding: 15px;
-  border: 1px solid #eee;
+  margin-top: 16px;
+  padding: 20px;
+  border: 1px solid #e5e7eb;
   border-radius: 8px;
+  background: #fff;
+}
+
+.blog-header,
+.author-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.blog-header h3,
+.author-card h3 {
+  margin-top: 0;
 }
 
 .actions button {
@@ -61,13 +84,27 @@
 }
 
 .comments {
-  margin-top: 15px;
+  margin-top: 18px;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 12px;
 }
 
 .author,
 .comment-message,
-.message {
+.message,
+.empty,
+.loading,
+.sample {
   color: #555;
+}
+
+.badge {
+  background: #e0f2fe;
+  color: #0369a1;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .recommendations {
@@ -81,8 +118,12 @@
   padding: 8px 0;
 }
 
-.locked {
+.author-card {
   background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 18px;
+  margin-top: 12px;
 }
 
 button:disabled,

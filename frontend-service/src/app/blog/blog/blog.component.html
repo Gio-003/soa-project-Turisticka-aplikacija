@@ -1,16 +1,15 @@
 <div class="container">
-  <h2>Create a New Blog</h2>
-  <div class="form-group">
-    <input type="text" [(ngModel)]="newBlogTitle" placeholder="Blog Title" class="form-control">
-  </div>
-  <div class="form-group">
-    <textarea [(ngModel)]="newBlogDescription" placeholder="Blog Description" class="form-control"></textarea>
-  </div>
-  <button (click)="createBlog()" class="btn btn-primary">Create Blog</button>
-
-  <hr>
+  <section class="create-panel">
+    <h2>Create Blog</h2>
+    <div class="form-grid">
+      <input type="text" [(ngModel)]="newBlogTitle" placeholder="Blog title" class="form-control">
+      <textarea [(ngModel)]="newBlogDescription" placeholder="Blog description" class="form-control"></textarea>
+    </div>
+    <button (click)="createBlog()" class="btn btn-primary">Create Blog</button>
+  </section>
 
   <p class="message" *ngIf="message">{{ message }}</p>
+  <p class="loading" *ngIf="isLoading">Loading blogs...</p>
 
   <div class="recommendations" *ngIf="recommendations.length > 0">
     <h2>Recommended profiles</h2>
@@ -21,16 +20,23 @@
   </div>
 
   <h2>Blogs</h2>
-  <p *ngIf="visibleBlogs.length === 0">Follow users to see their blogs.</p>
+  <p class="empty" *ngIf="!isLoading && visibleBlogs.length === 0">Follow authors to unlock their blogs and comments.</p>
 
   <div *ngFor="let blog of visibleBlogs" class="blog-post">
-    <h3>{{ blog.title }}</h3>
-    <p class="author">Author ID: {{ blog.authorId }}</p>
+    <div class="blog-header">
+      <div>
+        <h3>{{ blog.title }}</h3>
+        <p class="author">Author ID: {{ blog.authorId }}</p>
+      </div>
+      <span class="badge" *ngIf="isOwnBlog(blog)">Your blog</span>
+      <button *ngIf="!isOwnBlog(blog)" (click)="unfollow(blog.authorId)" class="btn btn-warning">Unfollow</button>
+    </div>
     <p>{{ blog.description }}</p>
     <div class="actions">
-      <button (click)="likeBlog(blog.id)" class="btn btn-success">Like ({{ blog.likes.length }})</button>
-      <button (click)="unlikeBlog(blog.id)" class="btn btn-danger">Unlike</button>
-      <button *ngIf="!isOwnBlog(blog)" (click)="unfollow(blog.authorId)" class="btn btn-warning">Unfollow author</button>
+      <button (click)="likeBlog(blog.id)" class="btn btn-success">
+        {{ hasLiked(blog) ? 'Liked' : 'Like' }} ({{ likesCount(blog) }})
+      </button>
+      <button (click)="unlikeBlog(blog.id)" class="btn btn-danger" [disabled]="!hasLiked(blog)">Unlike</button>
     </div>
 
     <div class="comments">
@@ -53,13 +59,14 @@
     </div>
   </div>
 
-  <div class="locked-blogs" *ngIf="lockedBlogs.length > 0">
-    <h2>Other blog authors</h2>
-    <div *ngFor="let blog of lockedBlogs" class="blog-post locked">
-      <h3>{{ blog.title }}</h3>
-      <p class="author">Author ID: {{ blog.authorId }}</p>
-      <p>Follow this author to read and comment on their blogs.</p>
-      <button (click)="follow(blog.authorId)" class="btn btn-primary">Follow author</button>
+  <div class="locked-blogs" *ngIf="!isLoading && lockedAuthors.length > 0">
+    <h2>Authors To Follow</h2>
+    <div *ngFor="let author of lockedAuthors" class="author-card">
+      <div>
+        <h3>Author {{ author.id }}</h3>
+        <p>{{ author.blogCount }} locked blog{{ author.blogCount === 1 ? '' : 's' }}</p>
+      </div>
+      <button (click)="follow(author.id)" class="btn btn-primary">Follow</button>
     </div>
   </div>
 </div>

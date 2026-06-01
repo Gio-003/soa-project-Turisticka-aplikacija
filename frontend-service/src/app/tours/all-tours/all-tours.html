@@ -31,6 +31,13 @@
       <p>{{ selectedTour.description }}</p>
       <p><strong>Status:</strong> {{ selectedTour.status }}</p>
       <p><strong>Price:</strong> {{ selectedTour.price | number:'1.2-2' }}</p>
+      <p><strong>Tour length:</strong> {{ selectedTour.lengthInKm }} km</p>
+      <div class="duration-summary" *ngIf="selectedTour.durations?.length">
+        <strong>Traversal time:</strong>
+        <span *ngFor="let duration of selectedTour.durations">
+          {{ transportLabel(duration.transportType) }} - {{ duration.durationInMinutes }} min
+        </span>
+      </div>
       <p *ngIf="!selectedTour.isPurchased && isTourist()">
         You can see only the starting key point until you purchase this tour.
       </p>
@@ -54,7 +61,10 @@
 
       <!-- TOUR REVIEWS -->
       <ng-container *ngIf="selectedTour">
-        <app-tour-reviews [tourId]="selectedTour.id"></app-tour-reviews>
+        <app-tour-reviews
+          [tourId]="selectedTour.id"
+          [canWriteReview]="isTourist() && selectedTour.isPurchased">
+        </app-tour-reviews>
       </ng-container>
 
       <!-- FORMA ZA IZMENU/DODAVANJE -->
@@ -74,7 +84,6 @@
           <button class="btn-cancel" (click)="cancelEdit()">Cancel</button>
         </div>
       </div>
-      <p><strong>Tour length:</strong> {{ selectedTour.lengthInKm }} km</p>
       <!-- LISTA KLJUČNIH TAČAKA -->
       <div class="key-points-list">
         <h4>Key Points</h4>
@@ -84,6 +93,7 @@
             <div class="kp-info">
               <strong>{{ kp.name }}</strong>
               <p>{{ kp.description }}</p>
+              <img *ngIf="kp.image" [src]="kp.image" [alt]="kp.name" class="kp-image">
             </div>
             <div class="kp-actions" *ngIf="userService.currentUser?.role === 'GUIDE'">
               <button (click)="startEditKeyPoint(kp)">Edit</button>

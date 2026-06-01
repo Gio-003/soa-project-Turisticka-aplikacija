@@ -19,6 +19,11 @@ type followerPermissionResponse struct {
 	CanComment bool `json:"canComment"`
 }
 
+type BlogAuthorResponse struct {
+	ID        string `json:"id"`
+	BlogCount int    `json:"blogCount"`
+}
+
 func GetAllBlogsGrpc(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -39,6 +44,37 @@ func GetAllBlogsGrpc(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(filteredBlogs)
+}
+
+func GetBlogAuthorsGrpc(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	resp, err := grpcclient.BlogClient.GetAllBlogs(ctx, &pb.EmptyRequest{})
+	if err != nil {
+		http.Error(w, "RPC error: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	userID := r.Header.Get("X-User-ID")
+	authors := make(map[string]int)
+	for _, blog := range resp.Blogs {
+		if blog.AuthorId == "" || blog.AuthorId == userID || followerPermission(r, userID, blog.AuthorId, "can-read") {
+			continue
+		}
+		authors[blog.AuthorId]++
+	}
+
+	result := make([]BlogAuthorResponse, 0, len(authors))
+	for authorID, count := range authors {
+		result = append(result, BlogAuthorResponse{
+			ID:        authorID,
+			BlogCount: count,
+		})
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(result)
 }
 
 func GetBlogByIDGrpc(w http.ResponseWriter, r *http.Request) {

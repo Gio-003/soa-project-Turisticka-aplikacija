@@ -18,6 +18,7 @@ export interface Tour {
   difficulty: string;
   tags: string[];
   keyPoints: ApiKeyPoint[];
+  durations: { transportType: number | string; durationInMinutes: number }[];
   lengthInKm: number;
   price: number;
   status: string;
@@ -75,6 +76,20 @@ export class AllToursComponent implements OnInit {
 
   isPublished(tour: Tour): boolean {
     return String(tour.status).toLowerCase() === 'published';
+  }
+
+  transportLabel(transportType: number | string): string {
+    const labels: Record<number, string> = {
+      0: 'Walking',
+      1: 'Bicycle',
+      2: 'Car'
+    };
+
+    if (typeof transportType === 'number') {
+      return labels[transportType] || `Transport ${transportType}`;
+    }
+
+    return transportType;
   }
 
   loadTours(): void {

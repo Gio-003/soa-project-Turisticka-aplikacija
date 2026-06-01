@@ -20,6 +20,7 @@ public class PurchaseService
     public async Task<CartResponse> GetCart(int touristId)
     {
         var cart = await GetOrCreateCart(touristId);
+        await NormalizeCart(cart);
         return ToCartResponse(cart);
     }
 
@@ -39,16 +40,21 @@ public class PurchaseService
         var cart = await GetOrCreateCart(touristId);
         if (cart.Items.Any(i => i.TourId == tourId))
         {
+            await NormalizeCart(cart);
             return ToCartResponse(cart);
         }
 
-        cart.Items.Add(new OrderItem
+        var item = new OrderItem
         {
             Id = Guid.NewGuid(),
+            ShoppingCartId = cart.Id,
             TourId = tour.TourId,
             TourName = tour.TourName,
             Price = tour.Price
-        });
+        };
+
+        _context.OrderItems.Add(item);
+        cart.Items.Add(item);
 
         RecalculateTotal(cart);
         await _context.SaveChangesAsync();
@@ -153,6 +159,33 @@ public class PurchaseService
         return cart;
     }
 
+    private async Task NormalizeCart(ShoppingCart cart)
+    {
+        var duplicateItems = cart.Items
+            .GroupBy(i => i.TourId)
+            .SelectMany(group => group
+                .OrderBy(i => i.Id)
+                .Skip(1))
+            .ToList();
+
+        if (duplicateItems.Count > 0)
+        {
+            _context.OrderItems.RemoveRange(duplicateItems);
+            foreach (var duplicate in duplicateItems)
+            {
+                cart.Items.Remove(duplicate);
+            }
+        }
+
+        var previousTotal = cart.TotalPrice;
+        RecalculateTotal(cart);
+
+        if (duplicateItems.Count > 0 || previousTotal != cart.TotalPrice)
+        {
+            await _context.SaveChangesAsync();
+        }
+    }
+
     private static void RecalculateTotal(ShoppingCart cart)
     {
         cart.TotalPrice = cart.Items.Sum(i => i.Price);
@@ -164,7 +197,7 @@ public class PurchaseService
         {
             Id = cart.Id,
             TouristId = cart.TouristId,
-            TotalPrice = cart.TotalPrice,
+            TotalPrice = cart.Items.Sum(i => i.Price),
             Items = cart.Items.Select(i => new OrderItemResponse
             {
                 Id = i.Id,

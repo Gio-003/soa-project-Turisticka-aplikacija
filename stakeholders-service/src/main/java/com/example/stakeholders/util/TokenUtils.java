@@ -263,7 +263,7 @@ public class TokenUtils {
      * @return Informacija da li je token kreiran pre poslednje izmene lozinke ili ne.
      */
     private Boolean isCreatedBeforeLastPasswordReset(Date created, Date lastPasswordReset) {
-        return (lastPasswordReset != null && created.before(lastPasswordReset));
+        return (lastPasswordReset != null && created.getTime() / 1000 < lastPasswordReset.getTime() / 1000);
     }
 
     // =================================================================

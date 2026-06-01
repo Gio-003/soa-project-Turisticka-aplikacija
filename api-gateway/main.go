@@ -30,6 +30,7 @@ func main() {
 	//GRPC ZA BLOG SERVICE
 	// Blog rute - SA JWT-om
 	muxRouter.Handle("/api/blogs", middleware.JWTMiddlewareFunc(router.GetAllBlogsGrpc)).Methods("GET", "OPTIONS")
+	muxRouter.Handle("/api/blog-authors", middleware.JWTMiddlewareFunc(router.GetBlogAuthorsGrpc)).Methods("GET", "OPTIONS")
 	muxRouter.Handle("/api/blogs/{id}", middleware.JWTMiddlewareFunc(router.GetBlogByIDGrpc)).Methods("GET", "OPTIONS")
 
 	muxRouter.Handle("/api/blogs", middleware.JWTMiddlewareFunc(router.ProxyBlog)).Methods("POST", "OPTIONS")

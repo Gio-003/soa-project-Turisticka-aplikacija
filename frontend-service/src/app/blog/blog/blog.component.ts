@@ -4,6 +4,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FollowerService } from '../../services/follower.service';
 import { UserService } from '../../services/user.service';
+import { AuthService } from '../../services/auth.service';
+
+type LockedAuthor = {
+  id: string;
+  blogCount: number;
+};
 
 @Component({
   selector: 'app-blog',
@@ -15,40 +21,59 @@ import { UserService } from '../../services/user.service';
 export class BlogComponent implements OnInit {
   blogs: any[] = [];
   visibleBlogs: any[] = [];
-  lockedBlogs: any[] = [];
+  lockedAuthors: LockedAuthor[] = [];
   recommendations: { id: string }[] = [];
   followingIds = new Set<string>();
   newBlogTitle = '';
   newBlogDescription = '';
   message = '';
+  isLoading = true;
 
   constructor(
     private blogService: BlogService,
     private followerService: FollowerService,
-    public userService: UserService
+    public userService: UserService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
+    if (!this.userService.currentUser && this.authService.tokenIsPresent()) {
+      this.userService.getMyInfo().subscribe({
+        next: () => this.loadFollowerState(),
+        error: () => {
+          this.authService.clearSession();
+          this.isLoading = false;
+          this.message = 'Login again to view blogs.';
+        }
+      });
+      return;
+    }
+
     this.loadFollowerState();
   }
 
   currentUserId(): string {
-    return String(this.userService.currentUser?.id || '');
+    return String(this.userService.currentUser?.id || this.userService.currentUser?.Id || '');
   }
 
   loadFollowerState(): void {
     const userId = this.currentUserId();
     if (!userId) {
-      this.loadBlogs();
+      this.isLoading = false;
       return;
     }
 
+    this.isLoading = true;
     this.followerService.getFollowing(userId).subscribe({
       next: response => {
         this.followingIds = new Set((response.users || []).map(user => String(user.id)));
         this.loadBlogs();
+        this.loadLockedAuthors();
       },
-      error: () => this.loadBlogs()
+      error: () => {
+        this.loadBlogs();
+        this.loadLockedAuthors();
+      }
     });
 
     this.followerService.getRecommendations(userId).subscribe({
@@ -66,22 +91,38 @@ export class BlogComponent implements OnInit {
       next: data => {
         this.blogs = data || [];
         this.applyBlogVisibility();
+        this.isLoading = false;
       },
-      error: err => console.error('Error loading blogs:', err),
+      error: err => {
+        this.isLoading = false;
+        this.message = 'Could not load blogs.';
+        console.error('Error loading blogs:', err);
+      },
+    });
+  }
+
+  loadLockedAuthors(): void {
+    this.blogService.getBlogAuthors().subscribe({
+      next: authors => {
+        this.lockedAuthors = (authors || []).filter(author =>
+          String(author.id) !== this.currentUserId() && !this.followingIds.has(String(author.id))
+        );
+      },
+      error: err => {
+        this.lockedAuthors = [];
+        console.error('Error loading blog authors:', err);
+      },
     });
   }
 
   applyBlogVisibility(): void {
     const userId = this.currentUserId();
     this.visibleBlogs = [];
-    this.lockedBlogs = [];
 
     this.blogs.forEach(blog => {
       const authorId = String(blog.authorId);
       if (authorId === userId || this.followingIds.has(authorId)) {
         this.visibleBlogs.push(blog);
-      } else {
-        this.lockedBlogs.push(blog);
       }
     });
   }
@@ -105,21 +146,49 @@ export class BlogComponent implements OnInit {
 
   follow(authorId: string): void {
     const userId = this.currentUserId();
+    if (!userId) {
+      this.message = 'Login again before following authors.';
+      return;
+    }
+    if (String(authorId) === userId) {
+      this.message = 'You cannot follow yourself.';
+      return;
+    }
+
     this.followerService.follow(userId, authorId).subscribe({
       next: () => {
         this.message = 'Profile followed.';
         this.loadFollowerState();
-      }
+        this.loadLockedAuthors();
+      },
+      error: err => {
+        this.message = 'Could not follow this author.';
+        console.error('Error following author:', err);
+      },
     });
   }
 
   unfollow(authorId: string): void {
     const userId = this.currentUserId();
+    if (!userId) {
+      this.message = 'Login again before unfollowing authors.';
+      return;
+    }
+    if (String(authorId) === userId) {
+      this.message = 'You cannot unfollow yourself.';
+      return;
+    }
+
     this.followerService.unfollow(userId, authorId).subscribe({
       next: () => {
         this.message = 'Profile unfollowed.';
         this.loadFollowerState();
-      }
+        this.loadLockedAuthors();
+      },
+      error: err => {
+        this.message = 'Could not unfollow this author.';
+        console.error('Error unfollowing author:', err);
+      },
     });
   }
 
@@ -129,6 +198,14 @@ export class BlogComponent implements OnInit {
 
   canComment(blog: any): boolean {
     return this.isOwnBlog(blog) || this.followingIds.has(String(blog.authorId));
+  }
+
+  likesCount(blog: any): number {
+    return Array.isArray(blog.likes) ? blog.likes.length : 0;
+  }
+
+  hasLiked(blog: any): boolean {
+    return Array.isArray(blog.likes) && blog.likes.includes(this.currentUserId());
   }
 
   likeBlog(blogId: string): void {

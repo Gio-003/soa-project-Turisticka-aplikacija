@@ -28,7 +28,8 @@ export class Navbar {
 
   userName() {
     const user = this.userService.currentUser;
-    return user.firstName + ' ' + user.lastName;
+    const fullName = [user?.firstName, user?.lastName].filter(Boolean).join(' ');
+    return fullName || user?.username || `User ${user?.id}`;
   }
 
   hasSignedIn() {
@@ -36,7 +37,7 @@ export class Navbar {
   }
 
   goHome(): void {
-    this.router.navigate(['/videos']); // Pretpostavka da je ruta '/videos'
+    this.router.navigate(['/']);
   }
 
   logout() {
