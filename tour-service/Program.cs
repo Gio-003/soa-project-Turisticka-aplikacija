@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
+using tour_service.Clients;
 using tour_service.Data;
 using tour_service.Repositories;
 using tour_service.Services;
@@ -8,6 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddHttpClient<PurchaseRpcClient>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>

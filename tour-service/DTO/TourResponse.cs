@@ -19,5 +19,6 @@ namespace tour_service.DTO
         public List<TourDurationResponse> Durations { get; set; }
 
         public double LengthInKm { get; set; }
+        public bool IsPurchased { get; set; }
     }
 }

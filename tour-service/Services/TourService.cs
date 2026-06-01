@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using tour_service.Clients;
 using tour_service.Data;
 using tour_service.DTO;
 using tour_service.Enum;
@@ -11,14 +12,15 @@ namespace tour_service.Services
     {
         private readonly AppDbContext _context;
         private readonly TourRepository _repository;
+        private readonly PurchaseRpcClient _purchaseRpcClient;
 
-        public TourService(AppDbContext context, TourRepository tourRepository)
+        public TourService(AppDbContext context, TourRepository tourRepository, PurchaseRpcClient purchaseRpcClient)
         {
             _context = context;
             _repository = tourRepository;
+            _purchaseRpcClient = purchaseRpcClient;
         }
 
-        // CREATE TOUR
         public Tour CreateTour(CreateTourRequest request)
         {
             var tour = new Tour
@@ -29,21 +31,13 @@ namespace tour_service.Services
                 Difficulty = request.Difficulty,
                 AuthorId = request.AuthorId,
                 LengthInKm = request.LengthInKm,
-
                 Status = TourStatus.Draft,
-                Price = 0,
-
-                // NOVO: inicijalno null
+                Price = request.Price,
                 PublishedAt = null,
                 ArchivedAt = null,
-
                 Tags = request.Tags != null
-                    ? request.Tags.Select(tag => new TourTag
-                    {
-                        Name = tag
-                    }).ToList()
+                    ? request.Tags.Select(tag => new TourTag { Name = tag }).ToList()
                     : new List<TourTag>(),
-
                 KeyPoints = request.KeyPoints != null
                     ? request.KeyPoints.Select(kp => new KeyPoints
                     {
@@ -55,7 +49,6 @@ namespace tour_service.Services
                         Longitude = kp.Lng
                     }).ToList()
                     : new List<KeyPoints>(),
-
                 Durations = request.Durations != null
                     ? request.Durations.Select(d => new TourDuration
                     {
@@ -72,18 +65,16 @@ namespace tour_service.Services
             return tour;
         }
 
-        // PUBLISH TOUR
         public Tour PublishTour(Guid tourId)
         {
             var tour = _context.Tours.FirstOrDefault(t => t.Id == tourId);
-
             if (tour == null)
+            {
                 throw new Exception("Tour not found");
+            }
 
             tour.Status = TourStatus.Published;
             tour.PublishedAt = DateTime.UtcNow;
-
-            // ako se ponovo publishuje posle arhive
             tour.ArchivedAt = null;
 
             _context.SaveChanges();
@@ -91,13 +82,13 @@ namespace tour_service.Services
             return tour;
         }
 
-        // ARCHIVE TOUR
         public Tour ArchiveTour(Guid tourId)
         {
             var tour = _context.Tours.FirstOrDefault(t => t.Id == tourId);
-
             if (tour == null)
+            {
                 throw new Exception("Tour not found");
+            }
 
             tour.Status = TourStatus.Archived;
             tour.ArchivedAt = DateTime.UtcNow;
@@ -107,65 +98,135 @@ namespace tour_service.Services
             return tour;
         }
 
-        // GET TOURS BY AUTHOR
         public List<TourResponse> GetToursByAuthor(int authorId)
         {
             return _context.Tours
                 .Include(t => t.Tags)
                 .Include(t => t.KeyPoints)
+                .Include(t => t.Durations)
                 .Where(t => t.AuthorId == authorId)
-                .Select(t => new TourResponse
-                {
-                    Id = t.Id,
-                    Name = t.Name,
-                    Description = t.Description,
-                    Difficulty = t.Difficulty,
-                    Price = t.Price,
-                    Status = t.Status,
-
-                    Tags = t.Tags.Select(tag => tag.Name).ToList(),
-
-                    KeyPoints = t.KeyPoints.Select(kp => new KeyPointResponse
-                    {
-                        Id = kp.Id,
-                        Name = kp.Name,
-                        Description = kp.Description,
-                        ImageUrl = kp.ImageUrl,
-                        Latitude = kp.Latitude,
-                        Longitude = kp.Longitude
-                    }).ToList(),
-
-                    Durations = t.Durations.Select(d => new TourDurationResponse
-                    {
-                        TransportType = d.TransportType,
-                        DurationInMinutes = d.DurationInMinutes
-                    }).ToList(),
-                })
+                .AsEnumerable()
+                .Select(t => ToTourResponse(t, true, true))
                 .ToList();
         }
 
-        public List<Tour> GetAllTours()
+        public async Task<List<TourResponse>> GetAllTours(int? userId, string? role)
         {
-            return _repository.GetAll();
+            var tours = _repository.GetAll();
+            var result = new List<TourResponse>();
+
+            foreach (var tour in tours)
+            {
+                var includeAll = await ShouldIncludeAllKeyPoints(tour, userId, role);
+                result.Add(ToTourResponse(tour, includeAll, includeAll));
+            }
+
+            return result;
+        }
+
+        public List<TourResponse> GetAllTours()
+        {
+            return _repository.GetAll()
+                .Select(t => ToTourResponse(t, false, false))
+                .ToList();
         }
 
         public Tour UpdateLength(Guid tourId, double length)
         {
             var tour = _context.Tours.FirstOrDefault(t => t.Id == tourId);
-
             if (tour == null)
+            {
                 throw new Exception("Tour not found");
+            }
 
             tour.LengthInKm = length;
-
             _context.SaveChanges();
 
             return tour;
         }
 
-        public Tour GetTourById(Guid tourId)
+        public async Task<TourResponse?> GetTourById(Guid tourId, int? userId, string? role)
         {
-            return _repository.GetById(tourId);
+            var tour = _repository.GetById(tourId);
+            if (tour == null)
+            {
+                return null;
+            }
+
+            var includeAll = await ShouldIncludeAllKeyPoints(tour, userId, role);
+            return ToTourResponse(tour, includeAll, includeAll);
+        }
+
+        public TourForPurchaseResponse GetTourForPurchase(Guid tourId)
+        {
+            var tour = _repository.GetById(tourId);
+            if (tour == null)
+            {
+                throw new Exception("Tour not found");
+            }
+
+            return new TourForPurchaseResponse
+            {
+                TourId = tour.Id,
+                TourName = tour.Name,
+                Price = tour.Price,
+                Status = tour.Status
+            };
+        }
+
+        private async Task<bool> ShouldIncludeAllKeyPoints(Tour tour, int? userId, string? role)
+        {
+            if (string.Equals(role, "GUIDE", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(role, "ADMIN", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            if (userId.HasValue && tour.AuthorId == userId.Value)
+            {
+                return true;
+            }
+
+            if (!userId.HasValue)
+            {
+                return false;
+            }
+
+            return await _purchaseRpcClient.HasTourPurchaseToken(userId.Value, tour.Id);
+        }
+
+        private static TourResponse ToTourResponse(Tour tour, bool includeAllKeyPoints, bool isPurchased)
+        {
+            var keyPoints = includeAllKeyPoints
+                ? tour.KeyPoints
+                : tour.KeyPoints.Take(1);
+
+            return new TourResponse
+            {
+                Id = tour.Id,
+                Name = tour.Name,
+                Description = tour.Description,
+                Difficulty = tour.Difficulty,
+                Price = tour.Price,
+                Status = tour.Status,
+                Tags = tour.Tags.Select(tag => tag.Name).ToList(),
+                KeyPoints = keyPoints.Select(kp => new KeyPointResponse
+                {
+                    Id = kp.Id,
+                    Name = kp.Name,
+                    Description = kp.Description,
+                    ImageUrl = kp.ImageUrl,
+                    Latitude = kp.Latitude,
+                    Longitude = kp.Longitude
+                }).ToList(),
+                Durations = tour.Durations.Select(d => new TourDurationResponse
+                {
+                    TransportType = d.TransportType,
+                    DurationInMinutes = d.DurationInMinutes
+                }).ToList(),
+                LengthInKm = tour.LengthInKm,
+                IsPurchased = isPurchased
+            };
         }
     }
 }

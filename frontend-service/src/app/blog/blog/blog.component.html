@@ -10,13 +10,27 @@
 
   <hr>
 
+  <p class="message" *ngIf="message">{{ message }}</p>
+
+  <div class="recommendations" *ngIf="recommendations.length > 0">
+    <h2>Recommended profiles</h2>
+    <div class="recommendation" *ngFor="let recommendation of recommendations">
+      <span>User {{ recommendation.id }}</span>
+      <button (click)="follow(recommendation.id)" class="btn btn-primary">Follow</button>
+    </div>
+  </div>
+
   <h2>Blogs</h2>
-  <div *ngFor="let blog of blogs" class="blog-post">
+  <p *ngIf="visibleBlogs.length === 0">Follow users to see their blogs.</p>
+
+  <div *ngFor="let blog of visibleBlogs" class="blog-post">
     <h3>{{ blog.title }}</h3>
+    <p class="author">Author ID: {{ blog.authorId }}</p>
     <p>{{ blog.description }}</p>
     <div class="actions">
       <button (click)="likeBlog(blog.id)" class="btn btn-success">Like ({{ blog.likes.length }})</button>
       <button (click)="unlikeBlog(blog.id)" class="btn btn-danger">Unlike</button>
+      <button *ngIf="!isOwnBlog(blog)" (click)="unfollow(blog.authorId)" class="btn btn-warning">Unfollow author</button>
     </div>
 
     <div class="comments">
@@ -25,9 +39,27 @@
         <li *ngFor="let comment of blog.comments">{{ comment.content }}</li>
       </ul>
       <div class="form-group">
-        <input type="text" #commentInput placeholder="Add a comment" class="form-control">
+        <input
+          type="text"
+          #commentInput
+          placeholder="Add a comment"
+          class="form-control"
+          [disabled]="!canComment(blog)">
       </div>
-      <button (click)="addComment(blog.id, commentInput.value)" class="btn btn-secondary">Add Comment</button>
+      <p class="comment-message" *ngIf="!canComment(blog)">Follow this author to comment.</p>
+      <button (click)="addComment(blog, commentInput.value)" class="btn btn-secondary" [disabled]="!canComment(blog)">
+        Add Comment
+      </button>
+    </div>
+  </div>
+
+  <div class="locked-blogs" *ngIf="lockedBlogs.length > 0">
+    <h2>Other blog authors</h2>
+    <div *ngFor="let blog of lockedBlogs" class="blog-post locked">
+      <h3>{{ blog.title }}</h3>
+      <p class="author">Author ID: {{ blog.authorId }}</p>
+      <p>Follow this author to read and comment on their blogs.</p>
+      <button (click)="follow(blog.authorId)" class="btn btn-primary">Follow author</button>
     </div>
   </div>
 </div>

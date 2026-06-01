@@ -74,6 +74,16 @@ public class RpcController : ControllerBase
                     );
                     break;
 
+                case "GetTourForPurchase":
+                    var purchaseDict = JsonSerializer.Deserialize<Dictionary<string, string>>(
+                        request.@params.ToString()
+                    );
+
+                    response.result = _tourService.GetTourForPurchase(
+                        Guid.Parse(purchaseDict["tourId"])
+                    );
+                    break;
+
                 default:
                     response.error = new
                     {

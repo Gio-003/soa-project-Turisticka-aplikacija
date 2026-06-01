@@ -7,6 +7,7 @@ export interface CreateTourRequest {
   description: string;
   difficulty: string;
   tags: string[];
+  price?: number;
 }
 
 @Injectable({
@@ -35,6 +36,12 @@ export class TourService {
   getAllTours() {
     return this.apiService.get(
       this.config.tours_url + '/all'
+    );
+  }
+
+  getTourById(id: string) {
+    return this.apiService.get(
+      `${this.config.tours_url}/${id}`
     );
   }
 

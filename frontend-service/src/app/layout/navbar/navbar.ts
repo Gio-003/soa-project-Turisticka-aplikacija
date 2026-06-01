@@ -50,4 +50,8 @@ export class Navbar {
   goToBlogs(): void {
     this.router.navigate(['/blogs']);
   }
+
+  goToCart(): void {
+    this.router.navigate(['/cart']);
+  }
 }

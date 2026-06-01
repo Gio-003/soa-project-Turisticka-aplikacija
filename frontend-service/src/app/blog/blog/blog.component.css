@@ -44,6 +44,11 @@
   color: white;
 }
 
+.btn-warning {
+  background-color: #f59e0b;
+  color: white;
+}
+
 .blog-post {
   margin-top: 20px;
   padding: 15px;
@@ -57,4 +62,31 @@
 
 .comments {
   margin-top: 15px;
+}
+
+.author,
+.comment-message,
+.message {
+  color: #555;
+}
+
+.recommendations {
+  margin-bottom: 24px;
+}
+
+.recommendation {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.locked {
+  background: #f9fafb;
+}
+
+button:disabled,
+input:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
 }

@@ -1,0 +1,45 @@
+<div class="cart-page">
+  <div class="cart-header">
+    <h2>Shopping Cart</h2>
+    <button class="secondary-btn" (click)="backToTours()">Back to tours</button>
+  </div>
+
+  <p class="message" *ngIf="message">{{ message }}</p>
+  <p class="error" *ngIf="error">{{ error }}</p>
+
+  <div *ngIf="cart && cart.items.length === 0" class="empty-state">
+    Your cart is empty.
+  </div>
+
+  <table *ngIf="cart && cart.items.length > 0" class="cart-table">
+    <thead>
+      <tr>
+        <th>Tour</th>
+        <th>Price</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of cart.items">
+        <td>{{ item.tourName }}</td>
+        <td>{{ item.price | number:'1.2-2' }}</td>
+        <td>
+          <button class="danger-btn" (click)="remove(item.tourId)">Remove</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="cart" class="cart-summary">
+    <strong>Total:</strong>
+    <span>{{ cart.totalPrice | number:'1.2-2' }}</span>
+  </div>
+
+  <button
+    class="checkout-btn"
+    *ngIf="cart && cart.items.length > 0"
+    [disabled]="isCheckingOut"
+    (click)="checkout()">
+    {{ isCheckingOut ? 'Checking out...' : 'Checkout' }}
+  </button>
+</div>

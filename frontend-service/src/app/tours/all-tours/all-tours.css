@@ -176,3 +176,11 @@ button {
 .kp-actions button:last-child {
   background-color: #dc3545;
 }
+
+.purchase-message {
+  color: #166534;
+}
+
+.purchase-error {
+  color: #b91c1c;
+}

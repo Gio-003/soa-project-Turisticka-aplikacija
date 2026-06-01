@@ -1,14 +1,13 @@
 package handlers
 
 import (
+	"api-gateway/config"
+	"api-gateway/rpc"
 	"encoding/json"
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"api-gateway/rpc"
 )
-
-const tourServiceRPCURL = "http://localhost:55814/rpc"
 
 //
 // ==========================
@@ -25,7 +24,7 @@ func GetAllToursRPC(w http.ResponseWriter, r *http.Request) {
 	)
 
 	// 2. call .NET RPC service
-	rpcResp, err := rpc.CallRPC(tourServiceRPCURL, rpcReq)
+	rpcResp, err := rpc.CallRPC(config.ServiceURLs["tour"]+"/rpc", rpcReq)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -60,7 +59,7 @@ func GetMyToursRPC(w http.ResponseWriter, r *http.Request) {
 	)
 
 	// 3. call .NET RPC service
-	rpcResp, err := rpc.CallRPC(tourServiceRPCURL, rpcReq)
+	rpcResp, err := rpc.CallRPC(config.ServiceURLs["tour"]+"/rpc", rpcReq)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

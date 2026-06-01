@@ -10,6 +10,7 @@ var ServiceURLs = map[string]string{
 	"stakeholders": getEnv("STAKEHOLDERS_SERVICE_URL", "http://stakeholders-service:8080"),
 	"tour":         getEnv("TOUR_SERVICE_URL", "http://tour-service:8080"),
 	"follower":     getEnv("FOLLOWER_SERVICE_URL", "http://follower-service:8083"),
+	"purchase":     getEnv("PURCHASE_SERVICE_URL", "http://purchase-service:8080"),
 }
 
 // JWT Configuration

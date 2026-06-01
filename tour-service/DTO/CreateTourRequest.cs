@@ -19,7 +19,9 @@ namespace tour_service.DTO
 
         public int AuthorId { get; set; }
 
-           public double LengthInKm { get; set; }
+        public double LengthInKm { get; set; }
+
+        public decimal Price { get; set; }
     }
 
     public class KeyPointFromFrontDTO
