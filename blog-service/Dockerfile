@@ -1,12 +1,13 @@
 # build stage
 FROM golang:1.26.1-alpine AS builder
 
-WORKDIR /app
+WORKDIR /app/blog-service
 
-COPY go.mod go.sum ./
+COPY blog-service/go.mod blog-service/go.sum ./
+COPY common /app/common
 RUN go mod download
 
-COPY . .
+COPY blog-service .
 
 RUN go build -o main .
 
@@ -15,7 +16,7 @@ FROM alpine:latest
 
 WORKDIR /app
 
-COPY --from=builder /app/main .
+COPY --from=builder /app/blog-service/main .
 
 EXPOSE 8080
 

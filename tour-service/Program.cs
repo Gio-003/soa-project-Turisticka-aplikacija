@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using tour_service.Data;
 using tour_service.Repositories;
 using tour_service.Services;
+using tour_service.Saga;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,7 +32,7 @@ builder.Services.AddScoped<TourService>();
 builder.Services.AddScoped<ReviewService>();
 builder.Services.AddScoped<TourDurationRepository>();
 builder.Services.AddScoped<TourDurationService>();
-
+builder.Services.AddSingleton<PublishTourOrchestrator>();
 /*builder.Services.AddCors(options => //dodato odavde 
 {
     options.AddPolicy("AllowAngular", policy =>

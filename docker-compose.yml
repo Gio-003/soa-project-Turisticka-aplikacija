@@ -29,6 +29,11 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: pass
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     networks:
       - tourapp-network
 
@@ -51,13 +56,19 @@ services:
 
   blog-service:
     build:
-      context: ./blog-service
+      context: .
+      dockerfile: ./blog-service/Dockerfile
     ports:
       - "8080:8080"
     environment:
       MONGO_URI: mongodb://root:pass@mongo:27017/blogdb?authSource=admin
+      NATS_HOST: nats
+      NATS_PORT: "4222"
+      NATS_USER: ruser
+      NATS_PASS: T0pS3cr3t
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
     networks:
       - tourapp-network
 
@@ -114,6 +125,7 @@ services:
       - "8082:8080"
     environment:
       ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=tour_db;Username=postgres;Password=root"
+      NATS_URL: "nats://ruser:T0pS3cr3t@nats:4222"
     depends_on:
       postgres:
         condition: service_healthy
@@ -146,6 +158,15 @@ services:
       - stakeholders-service
       - tour-service
       - follower-service
+    networks:
+      - tourapp-network
+  nats:
+    image: nats
+    container_name: nats
+    restart: on-failure
+    ports:
+      - "4222:4222"
+    command: ["-user", "ruser", "-pass", "T0pS3cr3t"]
     networks:
       - tourapp-network
 
