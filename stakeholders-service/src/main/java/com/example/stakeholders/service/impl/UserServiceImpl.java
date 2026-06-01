@@ -140,4 +140,18 @@ public class UserServiceImpl implements UserService {
         return AdminUserDto.fromUser(userRepository.save(user));
     }
 
+    @Override
+    public void deleteById(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "User not found."));
+
+        if (user.getRole() == RoleType.ADMIN) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Admin accounts cannot be deleted.");
+        }
+
+        userRepository.delete(user);
+    }
+
 }

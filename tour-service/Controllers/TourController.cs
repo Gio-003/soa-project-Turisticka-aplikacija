@@ -70,5 +70,21 @@ namespace MyApp.Controllers
 
             return Ok(result);
         }
+
+        [HttpPost("draft/{userId}")]
+        public IActionResult CreateDraftTour(long userId)
+        {
+            var tourResponse = _tourService.CreateDraftTour(userId);
+            return Ok(tourResponse);
+        }
+
+        [HttpDelete("{tourId}")]
+        public IActionResult DeleteTour(Guid tourId)
+        {
+            _tourService.DeleteTour(tourId);
+            return NoContent();
+        }
+
+
     }
 }

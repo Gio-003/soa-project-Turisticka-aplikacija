@@ -45,14 +45,11 @@ export class MyTours implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    const interval = setInterval(() => {
-      const user = this.userService.currentUser;
+    const user = this.userService.currentUser;
 
-      if (user && user.Id) {
-        clearInterval(interval);
-        this.loadMyTours(user.Id);
-      }
-    }, 50);
+    if (user?.id) {
+      this.loadMyTours(user.id);
+    }
   }
 
   goToCreateTour(): void {

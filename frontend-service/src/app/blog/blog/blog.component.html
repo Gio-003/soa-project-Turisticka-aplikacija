@@ -15,7 +15,7 @@
     <h3>{{ blog.title }}</h3>
     <p>{{ blog.description }}</p>
     <div class="actions">
-      <button (click)="likeBlog(blog.id)" class="btn btn-success">Like ({{ blog.likes.length }})</button>
+      <button (click)="likeBlog(blog.id)" class="btn btn-success">Like ({{ blog.likes?.length }})</button>
       <button (click)="unlikeBlog(blog.id)" class="btn btn-danger">Unlike</button>
     </div>
 

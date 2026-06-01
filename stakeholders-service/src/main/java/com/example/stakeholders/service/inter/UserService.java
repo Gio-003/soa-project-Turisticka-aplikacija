@@ -17,4 +17,5 @@ public interface UserService {
     UserInfo updateUserInfo(String username, UpdateUserInfoRequest updateUserInfoRequest);
     List<AdminUserDto> getAllUsersForAdmin();
     AdminUserDto blockUser(Long userId);
+    void deleteById(Long userId);
 }

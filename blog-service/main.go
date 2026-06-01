@@ -43,6 +43,8 @@ func main() {
 	router.HandleFunc("/blogs", blogHandler.CreateBlog).Methods("POST")
 	router.HandleFunc("/blogs", blogHandler.GetAllBlogs).Methods("GET")
 	router.HandleFunc("/blogs/{id}", blogHandler.GetBlogByID).Methods("GET")
+	router.HandleFunc("/blogs/welcome", blogHandler.CreateWelcomeBlog).Methods("POST")
+	router.HandleFunc("/blogs/{id}", blogHandler.DeleteBlog).Methods("DELETE")
 
 	// Rute za lajkove sada koriste blogHandler
 	router.HandleFunc("/blogs/{blogId}/likes", blogHandler.LikeBlog).Methods("POST")
