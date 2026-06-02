@@ -149,6 +149,35 @@ app-tour-reviews {
   margin: 0;
   color: #666;
 }
+
+.duration-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.duration-summary span {
+  background-color: #eef6f8;
+  border: 1px solid #c8e4eb;
+  border-radius: 999px;
+  color: #245766;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.9rem;
+}
+
+.kp-image {
+  display: block;
+  width: 220px;
+  max-width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-top: 0.75rem;
+  border: 1px solid #e5e7eb;
+}
+
 .kp-actions button {
   margin-left: 0.5rem;
 }
@@ -175,4 +204,12 @@ button {
 }
 .kp-actions button:last-child {
   background-color: #dc3545;
+}
+
+.purchase-message {
+  color: #166534;
+}
+
+.purchase-error {
+  color: #b91c1c;
 }

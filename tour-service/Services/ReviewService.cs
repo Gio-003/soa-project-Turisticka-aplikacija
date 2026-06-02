@@ -1,25 +1,32 @@
 using tour_service.Repositories;
 using tour_service.Models;
 using tour_service.DTO;
+using tour_service.Clients;
 
 namespace tour_service.Services
 {
     public class ReviewService
     {
         private readonly ReviewRepository _repository;
+        private readonly PurchaseRpcClient _purchaseRpcClient;
 
-        public ReviewService(ReviewRepository repository)
+        public ReviewService(ReviewRepository repository, PurchaseRpcClient purchaseRpcClient)
         {
             _repository = repository;
+            _purchaseRpcClient = purchaseRpcClient;
         }
 
-        public ReviewResponse CreateReview(Guid tourId, int touristId, string touristUsername, CreateReviewRequest request)
+        public async Task<ReviewResponse> CreateReview(Guid tourId, int touristId, string touristUsername, CreateReviewRequest request)
         {
             if (tourId == Guid.Empty)
                 throw new ArgumentException("Invalid tour id");
 
             if (request.Rating < 1 || request.Rating > 5)
                 throw new ArgumentException("Rating must be between 1 and 5");
+
+            var hasToken = await _purchaseRpcClient.HasTourPurchaseToken(touristId, tourId);
+            if (!hasToken)
+                throw new InvalidOperationException("Only tourists who purchased this tour can write a review.");
 
             var review = new Review
             {

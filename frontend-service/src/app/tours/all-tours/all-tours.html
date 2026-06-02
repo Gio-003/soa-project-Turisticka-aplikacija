@@ -15,7 +15,7 @@
     <ul class="tours-list">
       <li *ngFor="let tour of tours" (click)="selectTour(tour)" [class.active]="selectedTour?.id === tour.id">
         {{ tour.name }}
-        <small>{{ tour.difficulty }} | {{ tour.keyPoints.length }} key points</small>
+        <small>{{ tour.difficulty }} | {{ tour.status }} | {{ tour.keyPoints.length }} visible key point(s)</small>
       </li>
     </ul>
   </div>
@@ -28,6 +28,32 @@
 
     <div *ngIf="selectedTour">
       <h3>{{ selectedTour.name }}</h3>
+      <p>{{ selectedTour.description }}</p>
+      <p><strong>Status:</strong> {{ selectedTour.status }}</p>
+      <p><strong>Price:</strong> {{ selectedTour.price | number:'1.2-2' }}</p>
+      <p><strong>Tour length:</strong> {{ selectedTour.lengthInKm }} km</p>
+      <div class="duration-summary" *ngIf="selectedTour.durations?.length">
+        <strong>Traversal time:</strong>
+        <span *ngFor="let duration of selectedTour.durations">
+          {{ transportLabel(duration.transportType) }} - {{ duration.durationInMinutes }} min
+        </span>
+      </div>
+      <p *ngIf="!selectedTour.isPurchased && isTourist()">
+        You can see only the starting key point until you purchase this tour.
+      </p>
+      <p *ngIf="selectedTour.isPurchased && isTourist()">
+        Purchased tour: all key points are visible.
+      </p>
+      <p class="purchase-message" *ngIf="purchaseMessage">{{ purchaseMessage }}</p>
+      <p class="purchase-error" *ngIf="purchaseError">{{ purchaseError }}</p>
+
+      <button
+        class="btn-add-new"
+        *ngIf="isTourist() && isPublished(selectedTour) && !selectedTour.isPurchased"
+        (click)="addToCart(selectedTour)">
+        Add to cart
+      </button>
+      <p *ngIf="isTourist() && !isPublished(selectedTour)">Archived or draft tours cannot be bought.</p>
 
       <app-map [mode]="mapMode" [tourPoints]="mapKeyPoints" (onPointSelected)="handlePointSelected($event)"
         (onPointMoved)="handlePointMoved($event)" (tourLengthChanged)="onTourLengthChanged($event)">
@@ -35,7 +61,10 @@
 
       <!-- TOUR REVIEWS -->
       <ng-container *ngIf="selectedTour">
-        <app-tour-reviews [tourId]="selectedTour.id"></app-tour-reviews>
+        <app-tour-reviews
+          [tourId]="selectedTour.id"
+          [canWriteReview]="isTourist() && selectedTour.isPurchased">
+        </app-tour-reviews>
       </ng-container>
 
       <!-- FORMA ZA IZMENU/DODAVANJE -->
@@ -55,18 +84,18 @@
           <button class="btn-cancel" (click)="cancelEdit()">Cancel</button>
         </div>
       </div>
-      <p><strong>Tour length:</strong> {{ selectedTour?.lengthInKm }} km</p>
       <!-- LISTA KLJUČNIH TAČAKA -->
       <div class="key-points-list">
         <h4>Key Points</h4>
-        <button class="btn-add-new" (click)="startAddNewKeyPoint()">+ Add New Key Point</button>
+        <button class="btn-add-new" *ngIf="userService.currentUser?.role === 'GUIDE'" (click)="startAddNewKeyPoint()">+ Add New Key Point</button>
         <ul>
           <li *ngFor="let kp of mapKeyPoints">
             <div class="kp-info">
               <strong>{{ kp.name }}</strong>
               <p>{{ kp.description }}</p>
+              <img *ngIf="kp.image" [src]="kp.image" [alt]="kp.name" class="kp-image">
             </div>
-            <div class="kp-actions">
+            <div class="kp-actions" *ngIf="userService.currentUser?.role === 'GUIDE'">
               <button (click)="startEditKeyPoint(kp)">Edit</button>
               <button (click)="deleteKeyPoint(kp)">Delete</button>
             </div>

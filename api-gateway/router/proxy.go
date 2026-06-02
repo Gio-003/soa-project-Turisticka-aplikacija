@@ -28,6 +28,11 @@ func ProxyFollower(w http.ResponseWriter, r *http.Request) {
 	forwardRequest(w, r, config.ServiceURLs["follower"])
 }
 
+// ProxyPurchase routes requests to the purchase service
+func ProxyPurchase(w http.ResponseWriter, r *http.Request) {
+	forwardRequest(w, r, config.ServiceURLs["purchase"])
+}
+
 // forwardRequest forwards the request to the target service
 func forwardRequest(w http.ResponseWriter, r *http.Request, targetURL string) {
 	// Build the target URL

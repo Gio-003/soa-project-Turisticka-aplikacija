@@ -20,6 +20,7 @@ export interface CreateTourRequest {
   durations: TourDuration[];   // NOVO
   authorId: number;
   lengthInKm: number;
+  price: number;
 }
 @Component({
   selector: 'app-create-tour',
@@ -55,6 +56,7 @@ export class CreateTour implements OnInit {
       name: ['', Validators.required],
       description: ['', Validators.required],
       difficulty: ['', Validators.required],
+      price: [0, [Validators.required, Validators.min(0)]],
       tags: [''],
     });
   }
@@ -125,8 +127,9 @@ export class CreateTour implements OnInit {
         : [],
       keyPoints: this.keyPoints, // Sakupljene tačke sa mape ubacujemo u zahtev
       durations: this.durations,
-      authorId: this.userService.currentUser.Id,
-      lengthInKm: this.tourLength
+      authorId: this.userService.currentUser.id,
+      lengthInKm: this.tourLength,
+      price: Number(formValue.price)
     };
 
     // Slanje na backend preko servisa

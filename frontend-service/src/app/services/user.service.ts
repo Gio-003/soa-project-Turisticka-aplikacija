@@ -19,8 +19,14 @@ export class UserService {
   getMyInfo() {
     return this.apiService.get(this.config.whoami_url)
       .pipe(map(user => {
-        this.currentUser = user;
-        return user;
+        this.currentUser = {
+          ...user,
+          id: user.id ?? user.Id,
+          firstName: user.firstName ?? user.FirstName,
+          lastName: user.lastName ?? user.LastName,
+          role: user.role ?? user.Role
+        };
+        return this.currentUser;
       }));
   }
 

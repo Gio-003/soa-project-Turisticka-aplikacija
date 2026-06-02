@@ -2,9 +2,9 @@ package main
 
 import (
 	grpcclient "api-gateway/grpc"
+	"api-gateway/handlers"
 	"api-gateway/middleware"
 	"api-gateway/router"
-	"api-gateway/handlers" 
 	"log"
 	"net/http"
 
@@ -30,12 +30,14 @@ func main() {
 	//GRPC ZA BLOG SERVICE
 	// Blog rute - SA JWT-om
 	muxRouter.Handle("/api/blogs", middleware.JWTMiddlewareFunc(router.GetAllBlogsGrpc)).Methods("GET", "OPTIONS")
+	muxRouter.Handle("/api/blog-authors", middleware.JWTMiddlewareFunc(router.GetBlogAuthorsGrpc)).Methods("GET", "OPTIONS")
 	muxRouter.Handle("/api/blogs/{id}", middleware.JWTMiddlewareFunc(router.GetBlogByIDGrpc)).Methods("GET", "OPTIONS")
 
 	muxRouter.Handle("/api/blogs", middleware.JWTMiddlewareFunc(router.ProxyBlog)).Methods("POST", "OPTIONS")
 
 	muxRouter.Handle("/api/blogs/{blogId}/likes", middleware.JWTMiddlewareFunc(router.ProxyBlog)).Methods("POST", "DELETE", "OPTIONS")
-	muxRouter.Handle("/api/blogs/{blogId}/comments", middleware.JWTMiddlewareFunc(router.ProxyBlog)).Methods("GET", "POST", "OPTIONS")
+	muxRouter.Handle("/api/blogs/{blogId}/comments", middleware.JWTMiddlewareFunc(router.ProxyBlogWithReadCheck)).Methods("GET", "OPTIONS")
+	muxRouter.Handle("/api/blogs/{blogId}/comments", middleware.JWTMiddlewareFunc(router.AddCommentWithFollowerCheck)).Methods("POST", "OPTIONS")
 	muxRouter.Handle("/api/comments", middleware.JWTMiddlewareFunc(router.ProxyBlog)).Methods("POST", "GET", "OPTIONS")
 	muxRouter.Handle("/api/comments/{id}", middleware.JWTMiddlewareFunc(router.ProxyBlog)).Methods("PUT", "OPTIONS")
 
@@ -47,8 +49,8 @@ func main() {
 	muxRouter.Handle("/api/tours/{id}/publish", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("POST", "OPTIONS")
 	muxRouter.Handle("/api/tours/{id}/archive", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("POST", "OPTIONS")
 	muxRouter.Handle("/api/tours/{tourId}/length", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("PUT", "OPTIONS")
-	muxRouter.Handle("/api/tours/all", middleware.JWTMiddlewareFunc(handlers.GetAllToursRPC),).Methods("GET")
-	muxRouter.Handle("/api/tours/my/{authorId}", middleware.JWTMiddlewareFunc(handlers.GetMyToursRPC),).Methods("GET")	
+	muxRouter.Handle("/api/tours/all", middleware.JWTMiddlewareFunc(handlers.GetAllToursRPC)).Methods("GET")
+	muxRouter.Handle("/api/tours/my/{authorId}", middleware.JWTMiddlewareFunc(handlers.GetMyToursRPC)).Methods("GET")
 	muxRouter.Handle("/api/tours", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("POST", "GET", "OPTIONS")
 	muxRouter.Handle("/api/tours/{id}", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("GET", "OPTIONS")
 	muxRouter.Handle("/api/tours/{tourId}/keypoints", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("GET", "POST", "OPTIONS")
@@ -56,8 +58,8 @@ func main() {
 	muxRouter.Handle("/api/tours/{tourId}/reviews", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("GET", "POST", "OPTIONS")
 	muxRouter.Handle("/api/tours/{tourId}/durations", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("GET", "POST", "OPTIONS")
 	muxRouter.Handle("/api/tours/{tourId}/durations/{id}", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("PUT", "DELETE", "OPTIONS")
-	muxRouter.Handle("/api/tours/{id}/publish",middleware.JWTMiddlewareFunc(router.ProxyTour),).Methods("POST", "OPTIONS")
-	muxRouter.Handle("/api/tours/{id}/archive",middleware.JWTMiddlewareFunc(router.ProxyTour),).Methods("POST", "OPTIONS")
+	muxRouter.Handle("/api/tours/{id}/publish", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("POST", "OPTIONS")
+	muxRouter.Handle("/api/tours/{id}/archive", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("POST", "OPTIONS")
 
 	// Follower rute - SA JWT-om
 	muxRouter.Handle("/api/followers/{followerId}/follow/{followedId}", middleware.JWTMiddlewareFunc(router.ProxyFollower)).Methods("POST", "DELETE", "OPTIONS")
@@ -67,6 +69,12 @@ func main() {
 	muxRouter.Handle("/api/followers/{userId}/recommendations", middleware.JWTMiddlewareFunc(router.ProxyFollower)).Methods("GET", "OPTIONS")
 	muxRouter.Handle("/api/followers/{userId}/can-read/{authorId}", middleware.JWTMiddlewareFunc(router.ProxyFollower)).Methods("GET", "OPTIONS")
 	muxRouter.Handle("/api/followers/{userId}/can-comment/{authorId}", middleware.JWTMiddlewareFunc(router.ProxyFollower)).Methods("GET", "OPTIONS")
+
+	// Purchase rute - SA JWT-om
+	muxRouter.Handle("/api/cart", middleware.JWTMiddlewareFunc(router.ProxyPurchase)).Methods("GET", "OPTIONS")
+	muxRouter.Handle("/api/cart/items/{tourId}", middleware.JWTMiddlewareFunc(router.ProxyPurchase)).Methods("POST", "DELETE", "OPTIONS")
+	muxRouter.Handle("/api/cart/checkout", middleware.JWTMiddlewareFunc(router.ProxyPurchase)).Methods("POST", "OPTIONS")
+	muxRouter.Handle("/api/purchases/{tourId}/token", middleware.JWTMiddlewareFunc(router.ProxyPurchase)).Methods("GET", "OPTIONS")
 
 	// User/Profile rute - SA JWT-om
 	muxRouter.Handle("/api/getMyInfo", middleware.JWTMiddlewareFunc(router.ProxyAuth)).Methods("GET", "OPTIONS")
@@ -80,7 +88,7 @@ func main() {
 	muxRouter.Handle("/api/user/all", middleware.JWTMiddlewareFunc(middleware.AdminMiddlewareFunc(router.ProxyAuth))).Methods("GET", "OPTIONS")
 
 	port := ":8000"
-	log.Println("🚀 API Gateway starting on port" + port)
+	log.Println("API Gateway starting on port" + port)
 
 	if err := http.ListenAndServe(port, muxRouter); err != nil {
 		log.Fatal("Failed to start gateway: ", err)

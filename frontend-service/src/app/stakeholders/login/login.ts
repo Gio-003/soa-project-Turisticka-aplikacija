@@ -1,12 +1,11 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {ActivatedRoute, Router} from '@angular/router';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { Subject } from 'rxjs';
+import { switchMap, takeUntil } from 'rxjs/operators';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
-import {Subject} from 'rxjs';
-import {takeUntil} from 'rxjs/operators';
-import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
 
 interface DisplayMessage {
   msgType: string;
@@ -19,26 +18,13 @@ interface DisplayMessage {
   templateUrl: './login.html',
   styleUrls: ['./login.css']
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, OnDestroy {
   title = 'Login';
   form!: FormGroup;
-
-  /**
-   * Boolean used in telling the UI
-   * that the form has been submitted
-   * and is awaiting a response
-   */
   submitted = false;
-
-   /**
-   * Notification message from received
-   * form request or router
-   */
-    notification!: DisplayMessage;
-
-    returnUrl!: string;
-    private ngUnsubscribe: Subject<void> = new Subject<void>();
-
+  notification?: DisplayMessage;
+  returnUrl!: string;
+  private ngUnsubscribe: Subject<void> = new Subject<void>();
 
   constructor(
     private userService: UserService,
@@ -54,10 +40,10 @@ export class LoginComponent implements OnInit {
       .subscribe((params: any) => {
         this.notification = params as DisplayMessage;
       });
-    // get return url from route parameters or default to '/'
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/blogs';
     this.form = this.formBuilder.group({
-      username: ['', Validators.compose([Validators.required, Validators.email])],
+      username: ['', Validators.required],
       password: ['', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(32)])]
     });
   }
@@ -68,28 +54,32 @@ export class LoginComponent implements OnInit {
   }
 
   onSubmit() {
-  this.notification;
-  this.submitted = true;
+    if (this.form.invalid) {
+      this.notification = { msgType: 'error', msgBody: 'Username and password are required.' };
+      return;
+    }
 
-  this.authService.login(this.form.value)
-    .subscribe({
-      next: data => {
-        console.log(data);
-        this.userService.getMyInfo().subscribe();
-        this.router.navigate(['/']);
-      },
-      error: err => {
-        console.log(err);
-        this.submitted = false;
+    this.submitted = true;
+    this.notification = undefined;
 
-        if (err.status === 401) {
-          this.notification = {msgType: 'error', msgBody: 'Incorrect email or password..'};
-        } else {
-          // Ostale greške
-          this.notification = {msgType: 'error', msgBody: 'An error occurred. Try again.'};
+    this.authService.login(this.form.value)
+      .pipe(switchMap(() => this.userService.getMyInfo()))
+      .subscribe({
+        next: () => {
+          this.router.navigate([this.returnUrl]);
+        },
+        error: err => {
+          console.log(err);
+          this.submitted = false;
+
+          if (err.status === 401) {
+            this.notification = { msgType: 'error', msgBody: 'Incorrect username or password.' };
+            return;
+          }
+
+          this.authService.clearSession();
+          this.notification = { msgType: 'error', msgBody: 'Login succeeded, but user profile could not be loaded.' };
         }
-      }
-    });
-}
-
+      });
+  }
 }

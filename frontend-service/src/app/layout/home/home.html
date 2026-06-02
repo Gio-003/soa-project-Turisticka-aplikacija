@@ -1,1 +1,38 @@
-<p>home works!</p>
+<main class="home-page">
+  <section class="home-hero">
+    <div>
+      <p class="eyebrow">TravelApp</p>
+      <h1>Plan, share, and explore tours</h1>
+      <p class="intro">
+        Open the parts of the application you need for testing tours, blogs, follower access, and purchases.
+      </p>
+    </div>
+
+    <div class="home-actions" *ngIf="!hasSignedIn()">
+      <button type="button" (click)="goTo('/login')">Log in</button>
+      <button type="button" class="secondary" (click)="goTo('/signup')">Sign up</button>
+    </div>
+  </section>
+
+  <section class="shortcut-grid" *ngIf="hasSignedIn()">
+    <button type="button" class="shortcut" (click)="goTo('/blogs')">
+      <span>Blogs</span>
+      <small>Read followed authors and test comments</small>
+    </button>
+
+    <button type="button" class="shortcut" (click)="goTo('/tours/all')">
+      <span>Tours</span>
+      <small>Browse tour details and key points</small>
+    </button>
+
+    <button type="button" class="shortcut" *ngIf="isTourist()" (click)="goTo('/cart')">
+      <span>Cart</span>
+      <small>Review selected tours and checkout</small>
+    </button>
+
+    <button type="button" class="shortcut" *ngIf="isGuide()" (click)="goTo('/tours/my')">
+      <span>My tours</span>
+      <small>Create, publish, and archive tours</small>
+    </button>
+  </section>
+</main>

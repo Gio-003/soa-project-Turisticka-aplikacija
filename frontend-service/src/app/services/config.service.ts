@@ -16,6 +16,9 @@ private _api_url = 'http://localhost:8000/api'; // ovo
  private _user_url = this._api_url + '/user'; // ovo
 private _tours_url = this._api_url + '/tours'; // ovo
 private _reviews_url = this._api_url + '/tours';  // ovo
+private _followers_url = this._api_url + '/followers';
+private _cart_url = this._api_url + '/cart';
+private _purchases_url = this._api_url + '/purchases';
   
 /*  private _api_url = 'http://localhost:8080/api';
   private _tour_api_url = 'http://localhost:55814/api';
@@ -31,6 +34,18 @@ private _reviews_url = this._api_url + '/tours';  // ovo
 
   get reviews_url(): string {
     return this._reviews_url;
+  }
+
+  get followers_url(): string {
+    return this._followers_url;
+  }
+
+  get cart_url(): string {
+    return this._cart_url;
+  }
+
+  get purchases_url(): string {
+    return this._purchases_url;
   }
 
   get apiUrl(): string {

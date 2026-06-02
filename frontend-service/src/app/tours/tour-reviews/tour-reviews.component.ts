@@ -12,6 +12,7 @@ import { ReviewService, Review, CreateReviewRequest } from '../../services/revie
 })
 export class TourReviewsComponent implements OnInit, OnChanges {
   @Input() tourId!: string;
+  @Input() canWriteReview = false;
 
   reviews: Review[] = [];
   isLoading = false;
@@ -60,6 +61,11 @@ export class TourReviewsComponent implements OnInit, OnChanges {
   }
 
   toggleForm(): void {
+    if (!this.canWriteReview) {
+      this.error = 'Purchase this tour before writing a review.';
+      return;
+    }
+
     this.showForm = !this.showForm;
   }
 
