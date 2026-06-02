@@ -58,15 +58,22 @@ services:
 
   blog-service:
     build:
-      context: ./blog-service
+      context: .
+      dockerfile: ./blog-service/Dockerfile
     restart: always
     ports:
       - "8080:8080"
     environment:
       MONGO_URI: mongodb://root:pass@mongo:27017/blogdb?authSource=admin
+      NATS_HOST: nats
+      NATS_PORT: "4222"
+      NATS_USER: ruser
+      NATS_PASS: T0pS3cr3t
     depends_on:
       mongo:
         condition: service_healthy
+      nats:
+        condition: service_started
     networks:
       - tourapp-network
 
@@ -131,9 +138,12 @@ services:
     environment:
       ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=tour_db;Username=postgres;Password=root"
       PURCHASE_RPC_URL: http://purchase-service:8080/rpc
+      NATS_URL: "nats://ruser:T0pS3cr3t@nats:4222"
     depends_on:
       postgres:
         condition: service_healthy
+      nats:
+        condition: service_started
     networks:
       - tourapp-network
 
@@ -182,6 +192,15 @@ services:
       - tour-service
       - follower-service
       - purchase-service
+    networks:
+      - tourapp-network
+  nats:
+    image: nats
+    container_name: nats
+    restart: on-failure
+    ports:
+      - "4222:4222"
+    command: ["-user", "ruser", "-pass", "T0pS3cr3t"]
     networks:
       - tourapp-network
 

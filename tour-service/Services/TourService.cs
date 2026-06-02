@@ -5,6 +5,7 @@ using tour_service.DTO;
 using tour_service.Enum;
 using tour_service.Models;
 using tour_service.Repositories;
+using tour_service.Saga;
 
 namespace tour_service.Services
 {
@@ -13,12 +14,18 @@ namespace tour_service.Services
         private readonly AppDbContext _context;
         private readonly TourRepository _repository;
         private readonly PurchaseRpcClient _purchaseRpcClient;
+        private readonly PublishTourOrchestrator _orchestrator;
 
-        public TourService(AppDbContext context, TourRepository tourRepository, PurchaseRpcClient purchaseRpcClient)
+        public TourService(
+            AppDbContext context,
+            TourRepository tourRepository,
+            PurchaseRpcClient purchaseRpcClient,
+            PublishTourOrchestrator orchestrator)
         {
             _context = context;
             _repository = tourRepository;
             _purchaseRpcClient = purchaseRpcClient;
+            _orchestrator = orchestrator;
         }
 
         public Tour CreateTour(CreateTourRequest request)
@@ -78,8 +85,19 @@ namespace tour_service.Services
             tour.ArchivedAt = null;
 
             _context.SaveChanges();
+            _orchestrator.Start(tour);
 
             return tour;
+        }
+        public void RollbackTour(Guid tourId)
+        {
+            var tour = _context.Tours.FirstOrDefault(t => t.Id == tourId);
+            if (tour != null)
+            {
+                tour.Status = TourStatus.Draft;
+                tour.PublishedAt = null;
+                _context.SaveChanges();
+            }
         }
 
         public Tour ArchiveTour(Guid tourId)
