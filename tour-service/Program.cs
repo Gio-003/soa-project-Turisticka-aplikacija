@@ -35,6 +35,8 @@ builder.Services.AddScoped<TourService>();
 builder.Services.AddScoped<ReviewService>();
 builder.Services.AddScoped<TourDurationRepository>();
 builder.Services.AddScoped<TourDurationService>();
+builder.Services.AddScoped<TourExecutionRepository>();
+builder.Services.AddScoped<TourExecutionService>();
 builder.Services.AddSingleton<PublishTourOrchestrator>();
 /*builder.Services.AddCors(options => //dodato odavde 
 {

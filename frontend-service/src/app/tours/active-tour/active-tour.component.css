@@ -1,0 +1,21 @@
+.active-tour-container {
+  padding: 20px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.loading { color: #888; font-style: italic; }
+.status-message {
+  background: #e8f5e9;
+  border-left: 4px solid #4caf50;
+  padding: 10px 16px;
+  margin: 12px 0;
+  border-radius: 4px;
+}
+.key-points-progress { margin: 16px 0; }
+.key-points-progress ul { list-style: none; padding: 0; }
+.key-points-progress li { padding: 6px 0; font-size: 15px; }
+.key-points-progress li.completed { color: #4caf50; }
+.tour-actions { display: flex; gap: 12px; margin: 20px 0; }
+.btn-complete { background: #4caf50; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; }
+.btn-abandon { background: #f44336; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; }
+.last-activity { font-size: 12px; color: #999; }
