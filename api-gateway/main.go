@@ -61,6 +61,13 @@ func main() {
 	muxRouter.Handle("/api/tours/{id}/publish", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("POST", "OPTIONS")
 	muxRouter.Handle("/api/tours/{id}/archive", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("POST", "OPTIONS")
 
+	// Tour Execution rute - SA JWT-om
+	muxRouter.Handle("/api/tour-executions/start", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("POST", "OPTIONS")
+	muxRouter.Handle("/api/tour-executions/check-position", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("POST", "OPTIONS")
+	muxRouter.Handle("/api/tour-executions/{id}/complete", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("POST", "OPTIONS")
+	muxRouter.Handle("/api/tour-executions/{id}/abandon", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("POST", "OPTIONS")
+	muxRouter.Handle("/api/tour-executions/{id}", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("GET", "OPTIONS")
+
 	// Follower rute - SA JWT-om
 	muxRouter.Handle("/api/followers/{followerId}/follow/{followedId}", middleware.JWTMiddlewareFunc(router.ProxyFollower)).Methods("POST", "DELETE", "OPTIONS")
 	muxRouter.Handle("/api/followers/{followerId}/following", middleware.JWTMiddlewareFunc(router.ProxyFollower)).Methods("GET", "OPTIONS")

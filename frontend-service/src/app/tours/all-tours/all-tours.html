@@ -53,6 +53,12 @@
         (click)="addToCart(selectedTour)">
         Add to cart
       </button>
+      <button 
+        *ngIf="isTourist() && isPublished(selectedTour) && selectedTour.isPurchased"
+        class="btn-start-tour" 
+        (click)="startTour(selectedTour.id)">
+        ▶️ Start Tour
+      </button>
       <p *ngIf="isTourist() && !isPublished(selectedTour)">Archived or draft tours cannot be bought.</p>
 
       <app-map [mode]="mapMode" [tourPoints]="mapKeyPoints" (onPointSelected)="handlePointSelected($event)"

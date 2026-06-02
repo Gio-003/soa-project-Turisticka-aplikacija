@@ -265,4 +265,17 @@ export class AllToursComponent implements OnInit {
         .subscribe();
     }
   }
+
+  startTour(tourId: string): void {
+    const activeExecId = localStorage.getItem('activeExecutionId');
+    const activeTourId = localStorage.getItem('activeTourId');
+    
+    if (activeExecId && activeTourId === tourId) {
+      this.router.navigate(['/tours/active'], { 
+        queryParams: { tourId, executionId: activeExecId } 
+      });
+    } else {
+      this.router.navigate(['/tours/active'], { queryParams: { tourId } });
+    }
+  }
 }
