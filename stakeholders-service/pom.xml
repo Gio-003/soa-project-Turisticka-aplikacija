@@ -19,7 +19,9 @@
 				<scope>import</scope>
 			</dependency>
 		</dependencies>
+
 	</dependencyManagement>
+
 	<groupId>com.example</groupId>
 	<artifactId>stakeholders</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
@@ -114,6 +116,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+
 		</plugins>
 	</build>
 

@@ -25,8 +25,7 @@ func InitBlogClient() {
 	// "blog-service:50051" pretpostavlja da su servisi u istoj Docker mreži.
 	// Ako testiraš van Dockera, promeni u "localhost:50051".
 	conn, err = grpc.Dial(
-		//"blog-service:50051", 
-		"localhost:50051",
+		"blog-service:50051", 
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	
