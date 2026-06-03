@@ -160,6 +160,68 @@ namespace tour_service.Migrations
                     b.ToTable("TourDurations", "tour");
                 });
 
+            modelBuilder.Entity("tour_service.Models.TourExecution", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("AbandonedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("LastActivity")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("StartedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<double>("StartLatitude")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("StartLongitude")
+                        .HasColumnType("double precision");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("TourId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("TouristId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TourId");
+
+                    b.ToTable("TourExecutions", "tour");
+                });
+
+            modelBuilder.Entity("tour_service.Models.CompletedKeyPoint", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("KeyPointId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TourExecutionId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TourExecutionId");
+
+                    b.ToTable("CompletedKeyPoints", "tour");
+                });
+
             modelBuilder.Entity("tour_service.Models.TourTag", b =>
                 {
                     b.Property<Guid>("Id")
@@ -224,6 +286,28 @@ namespace tour_service.Migrations
                     b.Navigation("Tour");
                 });
 
+            modelBuilder.Entity("tour_service.Models.CompletedKeyPoint", b =>
+                {
+                    b.HasOne("tour_service.Models.TourExecution", "TourExecution")
+                        .WithMany("CompletedKeyPoints")
+                        .HasForeignKey("TourExecutionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TourExecution");
+                });
+
+            modelBuilder.Entity("tour_service.Models.TourExecution", b =>
+                {
+                    b.HasOne("tour_service.Models.Tour", "Tour")
+                        .WithMany()
+                        .HasForeignKey("TourId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tour");
+                });
+
             modelBuilder.Entity("tour_service.Models.Tour", b =>
                 {
                     b.Navigation("Durations");
@@ -231,6 +315,11 @@ namespace tour_service.Migrations
                     b.Navigation("KeyPoints");
 
                     b.Navigation("Tags");
+                });
+
+            modelBuilder.Entity("tour_service.Models.TourExecution", b =>
+                {
+                    b.Navigation("CompletedKeyPoints");
                 });
 #pragma warning restore 612, 618
         }

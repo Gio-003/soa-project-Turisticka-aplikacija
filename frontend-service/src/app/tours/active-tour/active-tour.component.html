@@ -1,0 +1,38 @@
+<div class="active-tour-container">
+  <div *ngIf="isLoading" class="loading">Starting tour...</div>
+
+  <div *ngIf="!isLoading && tour">
+    <h2>🗺️ {{ tour.name }}</h2>
+
+    <div *ngIf="statusMessage" class="status-message">{{ statusMessage }}</div>
+
+    <p style="font-size: 13px; color: #555; margin-bottom: 8px;">
+      📍 Click on the map to move your position. Get close to a key point to check it off.
+    </p>
+
+    <app-map
+      [mode]="'edit'"
+      [tourPoints]="allMapPoints"
+      (onPointSelected)="onMapClick($event)">
+    </app-map>
+
+    <div class="key-points-progress">
+      <h4>Key Points Progress</h4>
+      <ul>
+        <li *ngFor="let kp of mapPoints" [class.completed]="isKeyPointCompleted(kp.id || '')">
+          <span>{{ isKeyPointCompleted(kp.id || '') ? '✅' : '⬜' }}</span>
+          {{ kp.name }}
+        </li>
+      </ul>
+    </div>
+
+    <div class="tour-actions">
+      <button class="btn-complete" (click)="completeTour()">✅ Complete Tour</button>
+      <button class="btn-abandon" (click)="abandonTour()">❌ Abandon Tour</button>
+    </div>
+
+    <p class="last-activity" *ngIf="execution?.lastActivity">
+      Last activity: {{ execution.lastActivity | date:'HH:mm:ss' }}
+    </p>
+  </div>
+</div>

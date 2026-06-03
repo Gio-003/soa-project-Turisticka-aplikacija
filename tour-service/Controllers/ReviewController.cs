@@ -23,7 +23,7 @@ namespace tour_service.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateReview([FromRoute] Guid tourId, [FromBody] CreateReviewRequest request)
+        public async Task<IActionResult> CreateReview([FromRoute] Guid tourId, [FromBody] CreateReviewRequest request)
         {
             var userIdHeader = HttpContext.Request.Headers["X-User-ID"].ToString();
             var userRoleHeader = HttpContext.Request.Headers["X-User-Role"].ToString();
@@ -44,8 +44,24 @@ namespace tour_service.Controllers
                 return BadRequest(new { error = "Invalid or missing X-Username header" });
             }
 
-            var review = _service.CreateReview(tourId, touristId, username, request);
-            return Ok(review);
+            if (!string.Equals(userRoleHeader, "TOURIST", StringComparison.OrdinalIgnoreCase))
+            {
+                return Forbid();
+            }
+
+            try
+            {
+                var review = await _service.CreateReview(tourId, touristId, username, request);
+                return Ok(review);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
+            }
         }
     }
 }

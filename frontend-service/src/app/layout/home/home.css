@@ -1,0 +1,95 @@
+.home-page {
+  padding: 48px 72px;
+}
+
+.home-hero {
+  align-items: center;
+  display: flex;
+  gap: 32px;
+  justify-content: space-between;
+  margin-bottom: 32px;
+}
+
+.eyebrow {
+  color: #4bb3c6;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+
+h1 {
+  color: #263238;
+  font-size: 40px;
+  margin: 0 0 12px;
+}
+
+.intro {
+  color: #54636a;
+  font-size: 17px;
+  line-height: 1.5;
+  margin: 0;
+  max-width: 680px;
+}
+
+.home-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.home-actions button,
+.shortcut {
+  background: #4bb3c6;
+  border: 0;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.home-actions button {
+  min-width: 100px;
+  padding: 14px 18px;
+}
+
+.home-actions .secondary {
+  background: #263238;
+}
+
+.shortcut-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.shortcut {
+  min-height: 132px;
+  padding: 22px;
+  text-align: left;
+}
+
+.shortcut span {
+  display: block;
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+.shortcut small {
+  color: rgba(255, 255, 255, 0.86);
+  display: block;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+@media (max-width: 720px) {
+  .home-page {
+    padding: 28px 18px;
+  }
+
+  .home-hero {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  h1 {
+    font-size: 32px;
+  }
+}

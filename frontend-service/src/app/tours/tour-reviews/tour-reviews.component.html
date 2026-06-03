@@ -13,9 +13,12 @@
 
   <!-- Submit review button -->
   <div class="review-actions">
-    <button (click)="toggleForm()" class="btn-submit-review">
+    <button *ngIf="canWriteReview" (click)="toggleForm()" class="btn-submit-review">
       {{ showForm ? 'Cancel' : 'Write a Review' }}
     </button>
+    <p *ngIf="!canWriteReview" class="review-locked">
+      Purchase this tour before writing a review.
+    </p>
   </div>
 
   <!-- Review form -->

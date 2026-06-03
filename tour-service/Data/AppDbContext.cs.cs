@@ -16,6 +16,8 @@ namespace tour_service.Data
         public DbSet<TourTag> TourTags { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<TourDuration> TourDurations { get; set; } // NOVO
+        public DbSet<TourExecution> TourExecutions { get; set; }
+        public DbSet<CompletedKeyPoint> CompletedKeyPoints { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -133,6 +135,40 @@ namespace tour_service.Data
                 entity.HasOne(td => td.Tour)
                       .WithMany(t => t.Durations)
                       .HasForeignKey(td => td.TourId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // =========================
+            // TOUR EXECUTION
+            // =========================
+            modelBuilder.Entity<TourExecution>(entity =>
+            {
+                entity.HasKey(te => te.Id);
+                entity.Property(te => te.TouristId).IsRequired();
+                entity.Property(te => te.Status).IsRequired();
+                entity.Property(te => te.StartedAt).IsRequired();
+                entity.Property(te => te.LastActivity).IsRequired();
+                entity.Property(te => te.StartLatitude).IsRequired();
+                entity.Property(te => te.StartLongitude).IsRequired();
+
+                entity.HasOne(te => te.Tour)
+                      .WithMany()
+                      .HasForeignKey(te => te.TourId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // =========================
+            // COMPLETED KEY POINT
+            // =========================
+            modelBuilder.Entity<CompletedKeyPoint>(entity =>
+            {
+                entity.HasKey(ckp => ckp.Id);
+                entity.Property(ckp => ckp.KeyPointId).IsRequired();
+                entity.Property(ckp => ckp.CompletedAt).IsRequired();
+
+                entity.HasOne(ckp => ckp.TourExecution)
+                      .WithMany(te => te.CompletedKeyPoints)
+                      .HasForeignKey(ckp => ckp.TourExecutionId)
                       .OnDelete(DeleteBehavior.Cascade);
             });
         }

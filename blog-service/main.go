@@ -15,6 +15,7 @@ import (
 	grpcserver "blog-service/grpc"
 	pb "blog-service/proto"
 
+	"github.com/Gio-003/soa-project-Turisticka-aplikacija/common/saga/messaging/nats"
 	"github.com/gorilla/mux"
 )
 
@@ -78,6 +79,40 @@ func main() {
 		port = ":8081"
 	}
 	log.Println("Starting server on " + port)
+
+	// ... tvoj postojeći kod (blogService inicijalizacija)
+
+	// 1. NATS Konektovanje (koristeći asistentov nats paket)
+	natsPublisher, pubErr := nats.NewNATSPublisher(
+		os.Getenv("NATS_HOST"), os.Getenv("NATS_PORT"),
+		os.Getenv("NATS_USER"), os.Getenv("NATS_PASS"),
+		"tour.publish.reply",
+	)
+
+	natsSubscriber, subErr := nats.NewNATSSubscriber(
+		os.Getenv("NATS_HOST"), os.Getenv("NATS_PORT"),
+		os.Getenv("NATS_USER"), os.Getenv("NATS_PASS"),
+		"tour.publish.command",
+		"blog-service-group",
+	)
+
+	if pubErr == nil && subErr == nil {
+		// 2. Inicijalizacija SAGA handlera
+		// On se automatski pretplaćuje na NATS kanale unutar New funkcije
+		_, handlerErr := handler.NewPublishTourCommandHandler(blogService, natsPublisher, natsSubscriber)
+		if handlerErr != nil {
+			log.Printf("Failed to initialize SAGA handler: %v", handlerErr)
+		} else {
+			log.Println("SAGA handler started successfully.")
+		}
+	} else {
+		if pubErr != nil {
+			log.Printf("NATS publisher connection failed: %v. SAGA will not work.", pubErr)
+		}
+		if subErr != nil {
+			log.Printf("NATS subscriber connection failed: %v. SAGA will not work.", subErr)
+		}
+	}
 
 	if err := http.ListenAndServe(port, router); err != nil {
 		log.Fatal("Failed to start server: ", err)

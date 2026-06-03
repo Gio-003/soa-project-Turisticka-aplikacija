@@ -31,16 +31,16 @@ namespace MyApp.Controllers
         }
 
         [HttpGet("all")]
-        public IActionResult GetAllTours()
+        public async Task<IActionResult> GetAllTours()
         {
-            var tours = _tourService.GetAllTours();
+            var tours = await _tourService.GetAllTours(ReadUserId(), ReadUserRole());
             return Ok(tours);
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetTourById(Guid id)
+        public async Task<IActionResult> GetTourById(Guid id)
         {
-            var tour = _tourService.GetTourById(id);
+            var tour = await _tourService.GetTourById(id, ReadUserId(), ReadUserRole());
             if (tour == null)
                 return NotFound(new { error = "Tour not found" });
             return Ok(tour);
@@ -85,6 +85,16 @@ namespace MyApp.Controllers
             return NoContent();
         }
 
+        private int? ReadUserId()
+        {
+            var userIdHeader = HttpContext.Request.Headers["X-User-ID"].ToString();
+            return int.TryParse(userIdHeader, out var userId) ? userId : null;
+        }
 
+        private string? ReadUserRole()
+        {
+            var role = HttpContext.Request.Headers["X-User-Role"].ToString();
+            return string.IsNullOrWhiteSpace(role) ? null : role;
+        }
     }
 }

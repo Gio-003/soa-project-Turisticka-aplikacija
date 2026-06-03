@@ -50,6 +50,11 @@
   background-color: #218838;
 }
 
+.review-locked {
+  color: #666;
+  margin: 0;
+}
+
 .review-form {
   background: white;
   padding: 20px;

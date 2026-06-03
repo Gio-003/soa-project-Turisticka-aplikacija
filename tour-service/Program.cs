@@ -1,13 +1,17 @@
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
+using tour_service.Clients;
 using tour_service.Data;
 using tour_service.Repositories;
 using tour_service.Services;
+using tour_service.Saga;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddHttpClient<PurchaseRpcClient>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -31,8 +35,11 @@ builder.Services.AddScoped<TourService>();
 builder.Services.AddScoped<ReviewService>();
 builder.Services.AddScoped<TourDurationRepository>();
 builder.Services.AddScoped<TourDurationService>();
-
+builder.Services.AddScoped<TourExecutionRepository>();
+builder.Services.AddScoped<TourExecutionService>();
+builder.Services.AddSingleton<PublishTourOrchestrator>();
 builder.Services.AddCors(options => //dodato odavde 
+
 {
     options.AddPolicy("AllowAngular", policy =>
     {
@@ -42,7 +49,7 @@ builder.Services.AddCors(options => //dodato odavde
             .AllowAnyMethod()
             .AllowCredentials();
     });
-}); //do ovde 
+}); //do ovde
 
 var app = builder.Build();
 

@@ -7,11 +7,16 @@ import { ApiService } from '../services/api.service';
 })
 export class BlogService {
   private apiUrl = 'http://localhost:8000/api/blogs';
+  private authorsUrl = 'http://localhost:8000/api/blog-authors';
 
   constructor(private apiService: ApiService) { }
 
 getAllBlogs(): Observable<any[]> {
   return this.apiService.get(this.apiUrl);
+}
+
+getBlogAuthors(): Observable<{ id: string; blogCount: number }[]> {
+  return this.apiService.get(this.authorsUrl);
 }
 
 getBlogById(id: string): Observable<any> {
