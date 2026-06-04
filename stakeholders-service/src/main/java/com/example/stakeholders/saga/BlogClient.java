@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.UUID;
 
-@FeignClient(name = "blog-service", url = "http://api-gateway:8000/api")
+@FeignClient(name = "blog-service", url = "http://localhost:8081")
 public interface BlogClient {
 
     @PostMapping("/blogs/welcome")

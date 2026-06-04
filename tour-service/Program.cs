@@ -5,6 +5,7 @@ using tour_service.Data;
 using tour_service.Repositories;
 using tour_service.Services;
 using tour_service.Saga;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,13 +32,14 @@ builder.Services.AddScoped<TourRepository>();
 builder.Services.AddScoped<KeyPointRepository>();
 builder.Services.AddScoped<ReviewRepository>();
 builder.Services.AddScoped<KeyPointService>();
-builder.Services.AddScoped<TourService>();
+builder.Services.AddScoped<TourDomainService>();
 builder.Services.AddScoped<ReviewService>();
 builder.Services.AddScoped<TourDurationRepository>();
 builder.Services.AddScoped<TourDurationService>();
 builder.Services.AddScoped<TourExecutionRepository>();
 builder.Services.AddScoped<TourExecutionService>();
 builder.Services.AddSingleton<PublishTourOrchestrator>();
+builder.Services.AddGrpc();
 builder.Services.AddCors(options => //dodato odavde 
 
 {
@@ -50,6 +52,19 @@ builder.Services.AddCors(options => //dodato odavde
             .AllowCredentials();
     });
 }); //do ovde
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenLocalhost(55816, o =>
+    {
+        o.Protocols = HttpProtocols.Http1;
+    });
+
+    options.ListenLocalhost(9090, o =>
+    {
+        o.Protocols = HttpProtocols.Http2;
+    });
+});
 
 var app = builder.Build();
 
@@ -67,7 +82,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
+app.MapGrpcService<TourGrpcService>();
 // Automatski primijeni migracije
 using (var scope = app.Services.CreateScope())
 {

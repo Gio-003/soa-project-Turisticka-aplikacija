@@ -9,14 +9,14 @@ using tour_service.Saga;
 
 namespace tour_service.Services
 {
-    public class TourService
+    public class TourDomainService
     {
         private readonly AppDbContext _context;
         private readonly TourRepository _repository;
         private readonly PurchaseRpcClient _purchaseRpcClient;
         private readonly PublishTourOrchestrator _orchestrator;
 
-        public TourService(
+        public TourDomainService(
             AppDbContext context,
             TourRepository tourRepository,
             PurchaseRpcClient purchaseRpcClient,

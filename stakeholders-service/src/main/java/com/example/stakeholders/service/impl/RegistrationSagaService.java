@@ -1,6 +1,7 @@
 package com.example.stakeholders.service.impl;
 
 import com.example.stakeholders.dto.UserRequest;
+import com.example.stakeholders.grpc.TourGrpcClient;
 import com.example.stakeholders.model.User;
 import com.example.stakeholders.saga.BlogClient;
 import com.example.stakeholders.saga.TourClient;
@@ -22,7 +23,7 @@ public class RegistrationSagaService {
     private BlogClient blogClient;
 
     @Autowired
-    private TourClient tourClient;
+    private TourGrpcClient tourGrpcClient;
 
     public User register(UserRequest request) {
 
@@ -33,20 +34,21 @@ public class RegistrationSagaService {
         }
 
         String blog = null;
-        UUID tour = null;
+        UUID tourId = null;
 
 
         try {
             blog = blogClient.createWelcomeBlog(user.getId());
-            tour = tourClient.createDraftTour(user.getId());
+            tourId = tourGrpcClient.createDraftTour(user.getId());
 
             return user;
 
         } catch (Exception e) {
 
+            e.printStackTrace();
 
-            if (tour != null) {
-                tourClient.deleteTour(tour);
+            if (tourId != null) {
+                tourGrpcClient.deleteTour(tourId);
             }
 
             if (blog != null) {
@@ -55,7 +57,7 @@ public class RegistrationSagaService {
 
             userService.deleteById(user.getId());
 
-            throw new RuntimeException("Saga failed: rollback executed");
+            throw new RuntimeException("Saga failed: rollback executed", e);
         }
     }
 }

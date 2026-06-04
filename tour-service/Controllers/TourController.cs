@@ -9,9 +9,9 @@ namespace MyApp.Controllers
     [Route("tours")]
     public class TourController : ControllerBase
     {
-        private readonly TourService _tourService;
+        private readonly TourDomainService _tourService;
 
-        public TourController(TourService tourService)
+        public TourController(TourDomainService tourService)
         {
             _tourService = tourService;
         }

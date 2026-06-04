@@ -56,7 +56,7 @@ namespace tour_service.Saga
             }
 
             using var scope = _serviceProvider.CreateScope();
-            var tourService = scope.ServiceProvider.GetRequiredService<Services.TourService>();
+            var tourService = scope.ServiceProvider.GetRequiredService<Services.TourDomainService>();
 
             if (reply.Type == PublishTourReplyType.BlogCreationFailed)
             {
