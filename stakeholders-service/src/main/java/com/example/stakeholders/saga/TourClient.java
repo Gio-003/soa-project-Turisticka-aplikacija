@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.UUID;
 
-@FeignClient(name = "tour-service", url = "http://localhost:55814")
+@FeignClient(name = "tour-service", url = "http://api-gateway:8000/api")
 public interface TourClient {
 
     @PostMapping("/tours/draft/{userId}")
