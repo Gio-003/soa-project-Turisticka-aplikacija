@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using tour_service.Clients;
 using tour_service.Data;
 using tour_service.Repositories;
@@ -12,6 +14,13 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddHttpClient<PurchaseRpcClient>();
+
+builder.Services.AddOpenTelemetry()
+    .ConfigureResource(resource => resource.AddService("tour-service"))
+    .WithTracing(tracing => tracing
+        .AddAspNetCoreInstrumentation()
+        .AddHttpClientInstrumentation()
+        .AddOtlpExporter());
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>

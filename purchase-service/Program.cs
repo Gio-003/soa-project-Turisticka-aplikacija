@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using purchase_service.Clients;
 using purchase_service.Data;
 using purchase_service.Services;
@@ -11,6 +13,13 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddHttpClient<TourRpcClient>();
 builder.Services.AddScoped<PurchaseService>();
+
+builder.Services.AddOpenTelemetry()
+    .ConfigureResource(resource => resource.AddService("purchase-service"))
+    .WithTracing(tracing => tracing
+        .AddAspNetCoreInstrumentation()
+        .AddHttpClientInstrumentation()
+        .AddOtlpExporter());
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>

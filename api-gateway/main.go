@@ -5,13 +5,29 @@ import (
 	"api-gateway/handlers"
 	"api-gateway/middleware"
 	"api-gateway/router"
+	"api-gateway/tracing"
+	"context"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/mux"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 func main() {
+	ctx := context.Background()
+	shutdownTracer, err := tracing.InitTracer(ctx, "api-gateway")
+	if err != nil {
+		log.Fatal("Failed to initialize tracing: ", err)
+	}
+	defer func() {
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := shutdownTracer(shutdownCtx); err != nil {
+			log.Printf("Failed to shutdown tracing: %v", err)
+		}
+	}()
 
 	// CORS middleware na svim rutama
 
@@ -97,7 +113,8 @@ func main() {
 	port := ":8000"
 	log.Println("API Gateway starting on port" + port)
 
-	if err := http.ListenAndServe(port, muxRouter); err != nil {
+	handler := otelhttp.NewHandler(muxRouter, "api-gateway")
+	if err := http.ListenAndServe(port, handler); err != nil {
 		log.Fatal("Failed to start gateway: ", err)
 	}
 }

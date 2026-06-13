@@ -139,10 +139,13 @@ services:
       ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=tour_db;Username=postgres;Password=root"
       PURCHASE_RPC_URL: http://purchase-service:8080/rpc
       NATS_URL: "nats://ruser:T0pS3cr3t@nats:4222"
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4317
     depends_on:
       postgres:
         condition: service_healthy
       nats:
+        condition: service_started
+      jaeger:
         condition: service_started
     networks:
       - tourapp-network
@@ -156,10 +159,13 @@ services:
     environment:
       ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=purchase_db;Username=postgres;Password=root"
       TOUR_RPC_URL: http://tour-service:8080/rpc
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4317
     depends_on:
       postgres:
         condition: service_healthy
       tour-service:
+        condition: service_started
+      jaeger:
         condition: service_started
     networks:
       - tourapp-network
@@ -186,14 +192,30 @@ services:
       FOLLOWER_SERVICE_URL: http://follower-service:8083
       PURCHASE_SERVICE_URL: http://purchase-service:8080
       JWT_SECRET: somesecret-key-for-jwt-token-has-to-be-512-bits-long-1234567890123456789
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4317
     depends_on:
       - blog-service
       - stakeholders-service
       - tour-service
       - follower-service
       - purchase-service
+      - jaeger
     networks:
       - tourapp-network
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.57
+    container_name: jaeger
+    restart: unless-stopped
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    networks:
+      - tourapp-network
+
   nats:
     image: nats
     container_name: nats
