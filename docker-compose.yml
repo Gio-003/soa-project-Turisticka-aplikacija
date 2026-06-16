@@ -27,7 +27,7 @@ services:
       retries: 10
     networks:
       - tourapp-network
-    logging: *fluent-bit
+
 
   mongo:
     image: mongo:7
@@ -45,7 +45,6 @@ services:
       retries: 15
     networks:
       - tourapp-network
-    logging: *fluent-bit
 
   mongo-express:
     image: mongo-express
@@ -64,7 +63,6 @@ services:
         condition: service_healthy
     networks:
       - tourapp-network
-    logging: *fluent-bit
 
   blog-service:
     build:
