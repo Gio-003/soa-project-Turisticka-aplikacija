@@ -39,6 +39,7 @@ builder.Services.AddScoped<TourDurationService>();
 builder.Services.AddScoped<TourExecutionRepository>();
 builder.Services.AddScoped<TourExecutionService>();
 builder.Services.AddSingleton<PublishTourOrchestrator>();
+builder.Services.AddHostedService<RegistrationTourSagaListener>();
 builder.Services.AddGrpc();
 builder.Services.AddCors(options => //dodato odavde 
 
@@ -55,12 +56,12 @@ builder.Services.AddCors(options => //dodato odavde
 
 builder.WebHost.ConfigureKestrel(options =>
 {
-    options.ListenLocalhost(55816, o =>
+    options.ListenAnyIP(8080, o =>
     {
         o.Protocols = HttpProtocols.Http1;
     });
 
-    options.ListenLocalhost(9090, o =>
+    options.ListenAnyIP(9090, o =>
     {
         o.Protocols = HttpProtocols.Http2;
     });

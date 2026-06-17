@@ -58,6 +58,7 @@ func (h *BlogHandler) CreateWelcomeBlog(w http.ResponseWriter, r *http.Request) 
 	w.Write([]byte(blog.ID.Hex()))
 }
 
+
 func (h *BlogHandler) DeleteBlog(w http.ResponseWriter, r *http.Request) {
     vars := mux.Vars(r)
     id := vars["id"]

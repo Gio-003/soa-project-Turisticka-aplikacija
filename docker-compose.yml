@@ -69,6 +69,7 @@ services:
       NATS_PORT: "4222"
       NATS_USER: ruser
       NATS_PASS: T0pS3cr3t
+      NATS_URL: nats://ruser:T0pS3cr3t@nats:4222
     depends_on:
       mongo:
         condition: service_healthy
@@ -123,6 +124,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/stakeholders_db
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: root
+      NATS_URL: nats://ruser:T0pS3cr3t@nats:4222
     depends_on:
       postgres:
         condition: service_healthy

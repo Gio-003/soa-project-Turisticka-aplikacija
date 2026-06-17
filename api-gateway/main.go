@@ -45,10 +45,10 @@ func main() {
 	muxRouter.Handle("/api/blogs/{blogId}", middleware.JWTMiddlewareFunc(router.ProxyBlog)).Methods("DELETE", "OPTIONS")
 
 	// Tour rute - SA JWT-om
-	muxRouter.Handle("/api/tours/all", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("GET", "OPTIONS")
-	muxRouter.Handle("/api/tours/my/{authorId}", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("GET", "OPTIONS")
-	//muxRouter.Handle("/api/tours/all", middleware.JWTMiddlewareFunc(handlers.GetAllToursRPC)).Methods("GET", "OPTIONS")
-	//muxRouter.Handle("/api/tours/my/{authorId}", middleware.JWTMiddlewareFunc(handlers.GetMyToursRPC)).Methods("GET", "OPTIONS")	
+	//muxRouter.Handle("/api/tours/all", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("GET", "OPTIONS")
+	//muxRouter.Handle("/api/tours/my/{authorId}", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("GET", "OPTIONS")
+	muxRouter.Handle("/api/tours/all", middleware.JWTMiddlewareFunc(handlers.GetAllToursRPC)).Methods("GET", "OPTIONS")
+	muxRouter.Handle("/api/tours/my/{authorId}", middleware.JWTMiddlewareFunc(handlers.GetMyToursRPC)).Methods("GET", "OPTIONS")	
 	muxRouter.Handle("/api/tours/{tourId}/durations/{durationId}", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("PUT", "DELETE", "OPTIONS")
 	muxRouter.Handle("/api/tours/{tourId}/durations", middleware.JWTMiddlewareFunc(router.ProxyTour)).Methods("POST", "GET", "OPTIONS")
 	muxRouter.Handle("/api/tours/{id}/publish", middleware.JWTMiddlewareFunc(handlers.PublishTourRPC)).Methods("POST", "OPTIONS")
