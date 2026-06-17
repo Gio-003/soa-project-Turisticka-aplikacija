@@ -266,6 +266,24 @@ services:
       - "24224:24224/udp"
     networks:
       - tourapp-network
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.47.2
+    container_name: cadvisor
+    restart: unless-stopped
+    privileged: true
+    devices:
+      - /dev/kmsg:/dev/kmsg
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "8090:8080"
+    networks:
+      - tourapp-network
+
   node-exporter:
     image: prom/node-exporter:latest
     container_name: node_exporter
@@ -294,6 +312,7 @@ services:
       - '--config.file=/etc/prometheus/prometheus.yml'
     depends_on:
       - node-exporter
+      - cadvisor
     networks:
       - tourapp-network
 
@@ -307,7 +326,7 @@ services:
       #GF_SECURITY_ADMIN_PASSWORD: admin
     volumes:
       - grafana_data:/var/lib/grafana
-      #- ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/provisioning:/etc/grafana/provisioning
     depends_on:
       - loki
       - prometheus
