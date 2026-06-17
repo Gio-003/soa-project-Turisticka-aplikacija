@@ -1,7 +1,7 @@
 x-logging: &fluent-bit
   driver: fluentd
   options:
-    fluentd-address: "localhost:24224"
+    fluentd-address: "host.docker.internal:24224"
     mode: non-blocking
     max-buffer-size: "4m"
 
@@ -84,7 +84,7 @@ services:
         condition: service_started
     networks:
       - tourapp-network
-    logging: *fluent-bit
+    #logging: *fluent-bit
 
   follower-service:
     build:
