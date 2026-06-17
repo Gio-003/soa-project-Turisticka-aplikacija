@@ -10,9 +10,9 @@ namespace tour_service.Controllers;
 [Route("rpc")]
 public class RpcController : ControllerBase
 {
-    private readonly TourService _tourService;
+    private readonly TourDomainService _tourService;
 
-    public RpcController(TourService tourService)
+    public RpcController(TourDomainService tourService)
     {
         _tourService = tourService;
     }

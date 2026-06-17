@@ -3,6 +3,7 @@ package grpc
 import (
 	pb "blog-service/proto"
 	"blog-service/service"
+	"blog-service/models" 
 	"context"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -83,4 +84,38 @@ func (s *BlogGrpcServer) GetBlogById(ctx context.Context, req *pb.BlogIdRequest)
 			Comments:    comments,
 		},
 	}, nil
+}
+
+func (s *BlogGrpcServer) CreateWelcomeBlog(
+	ctx context.Context,
+	req *pb.CreateWelcomeBlogRequest,
+) (*pb.CreateWelcomeBlogResponse, error) {
+
+	blog := &models.Blog{
+		Title:       "Hello everyone!",
+		Description: "I am a new tour guide. Soon, you can expect tours guided by me.",
+		AuthorID:    req.UserId,
+	}
+
+	err := s.Service.CreateWelcomeBlog(blog)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.CreateWelcomeBlogResponse{
+		BlogId: blog.ID.Hex(),
+	}, nil
+}
+
+func (s *BlogGrpcServer) DeleteBlog(
+	ctx context.Context,
+	req *pb.DeleteBlogRequest,
+) (*pb.EmptyResponse, error) {
+
+	err := s.Service.DeleteBlog(req.BlogId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.EmptyResponse{}, nil
 }

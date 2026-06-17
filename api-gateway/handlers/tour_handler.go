@@ -9,6 +9,14 @@ import (
 	"github.com/gorilla/mux"
 )
 
+const tourServiceRPCURL = "http://tour-service:8080/rpc"
+//const tourServiceRPCURL = "http://localhost:55816/rpc"
+//const tourServiceRPCURL = "http://localhost:5001/rpc"
+
+//
+
+
+
 // ==========================
 // GET /api/tours/all
 // ==========================

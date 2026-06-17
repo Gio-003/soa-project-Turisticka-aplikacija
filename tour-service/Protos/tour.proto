@@ -1,0 +1,26 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "TourGrpc";
+
+package tour;
+
+service TourService {
+  rpc CreateDraftTour (CreateDraftTourRequest) returns (CreateDraftTourResponse);
+  rpc DeleteTour (DeleteTourRequest) returns (DeleteTourResponse);
+}
+
+message CreateDraftTourRequest {
+  int64 userId = 1;
+}
+
+message CreateDraftTourResponse {
+  string tourId = 1;
+}
+
+message DeleteTourRequest {
+  string tourId = 1;
+}
+
+message DeleteTourResponse {
+  bool success = 1;
+}

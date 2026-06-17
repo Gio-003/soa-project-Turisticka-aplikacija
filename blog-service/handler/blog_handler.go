@@ -3,6 +3,7 @@ package handler
 import (
 	"blog-service/dto"
 	"blog-service/service"
+	"blog-service/models" 
 	"encoding/json"
 	"net/http"
 
@@ -13,6 +14,9 @@ type BlogHandler struct {
 	Service *service.BlogService
 }
 
+type BlogResponse struct {
+    BlogId string `json:"blogId"`
+}
 // --- Blog Metode ---
 
 func (h *BlogHandler) CreateBlog(w http.ResponseWriter, r *http.Request) {
@@ -32,6 +36,40 @@ func (h *BlogHandler) CreateBlog(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(blog)
+}
+
+func (h *BlogHandler) CreateWelcomeBlog(w http.ResponseWriter, r *http.Request) {
+    userId := r.URL.Query().Get("userId")
+
+    blog := &models.Blog{
+        Title:       "Hello everyone!",
+        Description: "I am a new tour guide. Soon, you can expect tours guided by me.",
+        AuthorID:    userId,
+    }
+
+    err := h.Service.CreateWelcomeBlog(blog)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    w.Header().Set("Content-Type", "text/plain")
+	w.WriteHeader(http.StatusCreated)
+	w.Write([]byte(blog.ID.Hex()))
+}
+
+
+func (h *BlogHandler) DeleteBlog(w http.ResponseWriter, r *http.Request) {
+    vars := mux.Vars(r)
+    id := vars["id"]
+
+    err := h.Service.DeleteBlog(id)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    w.WriteHeader(http.StatusNoContent)
 }
 
 func (h *BlogHandler) GetBlogByID(w http.ResponseWriter, r *http.Request) {

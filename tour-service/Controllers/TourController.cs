@@ -9,9 +9,9 @@ namespace MyApp.Controllers
     [Route("tours")]
     public class TourController : ControllerBase
     {
-        private readonly TourService _tourService;
+        private readonly TourDomainService _tourService;
 
-        public TourController(TourService tourService)
+        public TourController(TourDomainService tourService)
         {
             _tourService = tourService;
         }
@@ -69,6 +69,20 @@ namespace MyApp.Controllers
             );
 
             return Ok(result);
+        }
+
+        [HttpPost("draft/{userId}")]
+        public IActionResult CreateDraftTour(long userId)
+        {
+            var tourResponse = _tourService.CreateDraftTour(userId);
+            return Ok(tourResponse);
+        }
+
+        [HttpDelete("{tourId}")]
+        public IActionResult DeleteTour(Guid tourId)
+        {
+            _tourService.DeleteTour(tourId);
+            return NoContent();
         }
 
         private int? ReadUserId()
