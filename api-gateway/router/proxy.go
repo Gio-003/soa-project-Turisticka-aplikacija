@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 // ProxyBlog routes requests to the blog service
@@ -55,7 +57,7 @@ func forwardRequest(w http.ResponseWriter, r *http.Request, targetURL string) {
 	target.RawQuery = r.URL.RawQuery
 
 	// Create new request to backend service
-	proxyReq, err := http.NewRequest(r.Method, target.String(), r.Body)
+	proxyReq, err := http.NewRequestWithContext(r.Context(), r.Method, target.String(), r.Body)
 	if err != nil {
 		log.Printf("Error creating proxy request: %v", err)
 		http.Error(w, `{"error":"Error creating proxy request"}`, http.StatusBadGateway)
@@ -79,7 +81,7 @@ func forwardRequest(w http.ResponseWriter, r *http.Request, targetURL string) {
 	log.Printf("Forwarding %s %s to %s", r.Method, rawPath, target.String())
 
 	// Execute the request
-	client := &http.Client{}
+	client := &http.Client{Transport: otelhttp.NewTransport(http.DefaultTransport)}
 	resp, err := client.Do(proxyReq)
 	if err != nil {
 		log.Printf("Error forwarding request: %v", err)
