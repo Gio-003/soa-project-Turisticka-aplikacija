@@ -1,3 +1,10 @@
+x-logging: &fluent-bit
+  driver: fluentd
+  options:
+    fluentd-address: "host.docker.internal:24224"
+    mode: non-blocking
+    max-buffer-size: "4m"
+
 services:
 
   postgres:
@@ -20,6 +27,7 @@ services:
       retries: 10
     networks:
       - tourapp-network
+
 
   mongo:
     image: mongo:7
@@ -77,6 +85,7 @@ services:
         condition: service_started
     networks:
       - tourapp-network
+    #logging: *fluent-bit
 
   follower-service:
     build:
@@ -95,6 +104,7 @@ services:
         condition: service_healthy
     networks:
       - tourapp-network
+    logging: *fluent-bit
 
   neo4j:
     image: neo4j:5
@@ -114,6 +124,7 @@ services:
       retries: 20
     networks:
       - tourapp-network
+    logging: *fluent-bit
 
   stakeholders-service:
     build:
@@ -130,6 +141,7 @@ services:
         condition: service_healthy
     networks:
       - tourapp-network
+    logging: *fluent-bit
 
   tour-service:
     build:
@@ -151,6 +163,7 @@ services:
         condition: service_started
     networks:
       - tourapp-network
+    logging: *fluent-bit
 
   purchase-service:
     build:
@@ -171,6 +184,7 @@ services:
         condition: service_started
     networks:
       - tourapp-network
+    logging: *fluent-bit
 
   frontend-service:
     build:
@@ -180,6 +194,7 @@ services:
       - "4200:80"
     networks:
       - tourapp-network
+    logging: *fluent-bit
 
   api-gateway:
     build:
@@ -204,6 +219,7 @@ services:
       - jaeger
     networks:
       - tourapp-network
+    logging: *fluent-bit
 
   jaeger:
     image: jaegertracing/all-in-one:1.57
@@ -228,6 +244,28 @@ services:
     networks:
       - tourapp-network
 
+  # --- MONITORING STACK ---
+
+  loki:
+    image: grafana/loki:main-5206e3a
+    container_name: loki
+    ports:
+      - "3100:3100"
+    networks:
+      - tourapp-network
+
+  fluent-bit:
+    image: grafana/fluent-bit-plugin-loki:main-5206e3a-amd64
+    container_name: fluent_bit
+    environment:
+      - LOKI_URL=http://loki:3100/loki/api/v1/push
+    volumes:
+      - ./fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
+    networks:
+      - tourapp-network
   node-exporter:
     image: prom/node-exporter:latest
     container_name: node_exporter
@@ -260,17 +298,18 @@ services:
       - tourapp-network
 
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:8.5.3
     container_name: grafana
     restart: unless-stopped
     ports:
-      - "3001:3000"
-    environment:
-      GF_SECURITY_ADMIN_PASSWORD: admin
+      - "3000:3000"
+    #environment:
+      #GF_SECURITY_ADMIN_PASSWORD: admin
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+      #- ./monitoring/grafana/provisioning:/etc/grafana/provisioning
     depends_on:
+      - loki
       - prometheus
     networks:
       - tourapp-network
@@ -282,4 +321,5 @@ volumes:
 
 networks:
   tourapp-network:
+    name: tourapp-network
     driver: bridge
