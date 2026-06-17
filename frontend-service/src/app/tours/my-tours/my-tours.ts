@@ -45,14 +45,11 @@ export class MyTours implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    const interval = setInterval(() => {
-      const user = this.userService.currentUser;
+    const user = this.userService.currentUser;
 
-      if (user && user.Id) {
-        clearInterval(interval);
-        this.loadMyTours(user.Id);
-      }
-    }, 50);
+    if (user?.id) {
+      this.loadMyTours(user.id);
+    }
   }
 
   goToCreateTour(): void {
@@ -201,7 +198,11 @@ export class MyTours implements OnInit {
 
   publishTour(id: string): void {
 
-    // ✅ PROVERA DURATIONS
+    if (!this.selectedTour?.keyPoints || this.selectedTour.keyPoints.length === 0) {
+      alert('Morate dodati key points pre objavljivanja ture.');
+      return;
+    }
+
     if (!this.selectedTour?.durations || this.selectedTour.durations.length === 0) {
       alert('Potrebno je da popunite sve podatke pre objavljivanja ture.');
       return;

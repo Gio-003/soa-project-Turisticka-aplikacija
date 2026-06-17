@@ -1,5 +1,6 @@
 package com.example.stakeholders.controller;
 
+import com.example.stakeholders.service.impl.RegistrationSagaService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,6 +37,9 @@ public class AuthenticationController {
     private AuthenticationManager authenticationManager;
 
     @Autowired
+    private RegistrationSagaService registrationSagaService;
+
+    @Autowired
     private UserService userService;
 
     // Prvi endpoint koji pogadja korisnik kada se loguje.
@@ -63,14 +67,9 @@ public class AuthenticationController {
 
     // Endpoint za registraciju novog korisnika
     @PostMapping("/signup")
-    public ResponseEntity<User> addUser(@RequestBody UserRequest userRequest, UriComponentsBuilder ucBuilder) {
-        User existUser = this.userService.findByUsername(userRequest.getUsername());
+    public ResponseEntity<User> addUser(@RequestBody UserRequest userRequest) {
 
-        if (existUser != null) {
-            throw new ResourceConflictException(userRequest.getId(), "Username already exists");
-        }
-
-        User user = this.userService.save(userRequest);
+        User user = registrationSagaService.register(userRequest);
 
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }

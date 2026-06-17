@@ -9,14 +9,14 @@ using tour_service.Saga;
 
 namespace tour_service.Services
 {
-    public class TourService
+    public class TourDomainService
     {
         private readonly AppDbContext _context;
         private readonly TourRepository _repository;
         private readonly PurchaseRpcClient _purchaseRpcClient;
         private readonly PublishTourOrchestrator _orchestrator;
 
-        public TourService(
+        public TourDomainService(
             AppDbContext context,
             TourRepository tourRepository,
             PurchaseRpcClient purchaseRpcClient,
@@ -72,6 +72,51 @@ namespace tour_service.Services
             return tour;
         }
 
+        public Guid CreateDraftTour(long userId)
+        {
+            var tour = new Tour
+            {
+                Id = Guid.NewGuid(),
+                Name = "My first tour",
+                Description = "This is my first tour",
+                Difficulty = "EASY", // ili neki default enum/int
+                AuthorId = (int)userId,
+                LengthInKm = 0,
+
+                Status = TourStatus.Draft,
+                Price = 0,
+
+                PublishedAt = null,
+                ArchivedAt = null,
+
+                Tags = new List<TourTag>(),
+
+                KeyPoints = new List<KeyPoints>(),
+
+                Durations = new List<TourDuration>()
+            };
+
+            _context.Tours.Add(tour);
+            _context.SaveChanges();
+
+            return tour.Id;
+        }
+
+        public void DeleteTour(Guid tourId)
+        {
+            var tour = _context.Tours
+                .FirstOrDefault(t => t.Id == tourId);
+
+            if (tour == null)
+            {
+                throw new Exception("Tour not found");
+            }
+
+            _context.Tours.Remove(tour);
+            _context.SaveChanges();
+        }
+
+        // PUBLISH TOUR
         public Tour PublishTour(Guid tourId)
         {
             var tour = _context.Tours.FirstOrDefault(t => t.Id == tourId);

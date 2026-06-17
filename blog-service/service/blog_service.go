@@ -29,6 +29,14 @@ func (s *BlogService) GetBlogByID(blogID string) (*models.Blog, error) {
 	return s.Repository.GetByID(blogID)
 }
 
+func (s *BlogService) CreateWelcomeBlog(blog *models.Blog) error {
+    return s.Repository.Create(blog)
+}
+
+func (s *BlogService) DeleteBlog(id string) error {
+    return s.Repository.Delete(id)
+}
+
 // GetAllBlogs vraća sve blogove.
 func (s *BlogService) GetAllBlogs() ([]models.Blog, error) {
 	return s.Repository.GetAll()

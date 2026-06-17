@@ -33,10 +33,13 @@
     </div>
     <p>{{ blog.description }}</p>
     <div class="actions">
+      <button (click)="likeBlog(blog.id)" class="btn btn-success">Like ({{ blog.likes?.length }})</button>
+      <button (click)="unlikeBlog(blog.id)" class="btn btn-danger">Unlike</button>
       <button (click)="likeBlog(blog.id)" class="btn btn-success">
         {{ hasLiked(blog) ? 'Liked' : 'Like' }} ({{ likesCount(blog) }})
       </button>
       <button (click)="unlikeBlog(blog.id)" class="btn btn-danger" [disabled]="!hasLiked(blog)">Unlike</button>
+
     </div>
 
     <div class="comments">
