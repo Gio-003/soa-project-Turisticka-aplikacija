@@ -298,19 +298,19 @@ services:
       - tourapp-network
 
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:8.5.3
     container_name: grafana
     restart: unless-stopped
     ports:
-      - "3001:3000"
-    environment:
-      GF_SECURITY_ADMIN_PASSWORD: admin
+      - "3000:3000"
+    #environment:
+      #GF_SECURITY_ADMIN_PASSWORD: admin
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+      #- ./monitoring/grafana/provisioning:/etc/grafana/provisioning
     depends_on:
-      - prometheus
       - loki
+      - prometheus
     networks:
       - tourapp-network
 
