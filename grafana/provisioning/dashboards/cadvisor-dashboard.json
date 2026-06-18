@@ -49,8 +49,8 @@
       },
       "targets": [
         {
-          "expr": "sum(rate(container_cpu_usage_seconds_total{name=~\"$container\", name!=\"\"}[2m])) by (name)",
-          "legendFormat": "{{name}}",
+          "expr": "sum(rate(container_cpu_usage_seconds_total{id=~\"$container\"}[2m])) by (id)",
+          "legendFormat": "{{id}}",
           "refId": "A"
         }
       ],
@@ -87,8 +87,8 @@
       },
       "targets": [
         {
-          "expr": "sum(container_cpu_load_average_10s{name=~\"$container\", name!=\"\"}) by (name)",
-          "legendFormat": "{{name}}",
+          "expr": "sum(container_cpu_load_average_10s{id=~\"$container\"}) by (id)",
+          "legendFormat": "{{id}}",
           "refId": "A"
         }
       ],
@@ -132,8 +132,8 @@
       },
       "targets": [
         {
-          "expr": "container_memory_usage_bytes{name=~\"$container\", name!=\"\"}",
-          "legendFormat": "{{name}}",
+          "expr": "container_memory_usage_bytes{id=~\"$container\"}",
+          "legendFormat": "{{id}}",
           "refId": "A"
         }
       ],
@@ -170,8 +170,8 @@
       },
       "targets": [
         {
-          "expr": "container_memory_cache{name=~\"$container\", name!=\"\"}",
-          "legendFormat": "{{name}}",
+          "expr": "container_memory_cache{id=~\"$container\"}",
+          "legendFormat": "{{id}}",
           "refId": "A"
         }
       ],
@@ -215,8 +215,8 @@
       },
       "targets": [
         {
-          "expr": "rate(container_network_receive_bytes_total{name=~\"$container\", name!=\"\"}[2m])",
-          "legendFormat": "{{name}} rx",
+          "expr": "rate(container_network_receive_bytes_total{id=~\"$container\"}[2m])",
+          "legendFormat": "{{id}} rx",
           "refId": "A"
         }
       ],
@@ -253,8 +253,8 @@
       },
       "targets": [
         {
-          "expr": "rate(container_network_transmit_bytes_total{name=~\"$container\", name!=\"\"}[2m])",
-          "legendFormat": "{{name}} tx",
+          "expr": "rate(container_network_transmit_bytes_total{id=~\"$container\"}[2m])",
+          "legendFormat": "{{id}} tx",
           "refId": "A"
         }
       ],
@@ -298,8 +298,8 @@
       },
       "targets": [
         {
-          "expr": "rate(container_fs_reads_bytes_total{name=~\"$container\", name!=\"\"}[2m])",
-          "legendFormat": "{{name}}",
+          "expr": "rate(container_fs_reads_bytes_total{id=~\"$container\"}[2m])",
+          "legendFormat": "{{id}}",
           "refId": "A"
         }
       ],
@@ -336,8 +336,8 @@
       },
       "targets": [
         {
-          "expr": "rate(container_fs_writes_bytes_total{name=~\"$container\", name!=\"\"}[2m])",
-          "legendFormat": "{{name}}",
+          "expr": "rate(container_fs_writes_bytes_total{id=~\"$container\"}[2m])",
+          "legendFormat": "{{id}}",
           "refId": "A"
         }
       ],
@@ -384,8 +384,8 @@
       },
       "targets": [
         {
-          "expr": "count(container_last_seen{name=~\"$container\", name!=\"\"}) by (name)",
-          "legendFormat": "{{name}}",
+          "expr": "count(container_last_seen{id=~\"$container\"}) by (id)",
+          "legendFormat": "{{id}}",
           "refId": "A"
         }
       ],
@@ -403,7 +403,7 @@
         "allValue": ".*",
         "current": {},
         "datasource": "Prometheus",
-        "definition": "label_values(container_cpu_usage_seconds_total{name!=\"\"}, name)",
+        "definition": "label_values(container_cpu_usage_seconds_total, id)",
         "hide": 0,
         "includeAll": true,
         "label": "Container",
@@ -411,7 +411,7 @@
         "name": "container",
         "options": [],
         "query": {
-          "query": "label_values(container_cpu_usage_seconds_total{name!=\"\"}, name)",
+          "query": "label_values(container_cpu_usage_seconds_total, id)",
           "refId": "StandardVariableQuery"
         },
         "refresh": 2,
